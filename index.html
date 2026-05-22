@@ -9,19 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #fef8ee;
-    --ink: #1a1614;
-    --paper: #ffffff;
-    --accent: #ff5b22;
-    --accent-soft: #ffe8dd;
-    --green: #2d7d4f;
-    --green-soft: #d4edd9;
-    --red: #c63030;
-    --red-soft: #fad9d9;
-    --blue: #2c5282;
-    --blue-soft: #d6e4f0;
-    --muted: #8a807a;
-    --line: #e8ddd0;
+    --bg: #fef8ee; --ink: #1a1614; --paper: #ffffff;
+    --accent: #ff5b22; --accent-soft: #ffe8dd;
+    --green: #2d7d4f; --green-soft: #d4edd9;
+    --red: #c63030; --red-soft: #fad9d9;
+    --blue: #2c5282; --blue-soft: #d6e4f0;
+    --muted: #8a807a; --line: #e8ddd0;
     --shadow: 4px 4px 0 var(--ink);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -96,6 +89,7 @@
     padding: 16px 20px; border-radius: 4px;
     font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600;
     text-align: left; cursor: pointer; transition: all 0.15s ease; color: var(--ink);
+    width: 100%;
   }
   .option:hover:not(:disabled) {
     transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink);
@@ -118,7 +112,7 @@
     margin-bottom: 24px; letter-spacing: -0.01em;
   }
   .lueckentext input {
-    display: inline-block; width: auto; min-width: 100px;
+    display: inline-block; width: auto; min-width: 120px;
     font-size: 26px; padding: 4px 12px; margin: 0 4px; text-align: center;
   }
   .btn {
@@ -133,7 +127,7 @@
   .btn-accent { background: var(--accent); border-color: var(--accent); }
   .btn-secondary { background: var(--paper); color: var(--ink); }
   .btn-blue { background: var(--blue); border-color: var(--blue); }
-  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; justify-content: center; }
   .feedback {
     margin-top: 20px; padding: 16px 20px; border-radius: 4px;
     border: 2px solid; font-size: 16px; line-height: 1.5;
@@ -244,22 +238,33 @@
     font-family: 'JetBrains Mono', monospace; font-size: 12px;
     text-transform: uppercase; letter-spacing: 0.1em;
     text-decoration: underline; cursor: pointer; margin-top: 12px;
+    background: none; border: none; padding: 6px 12px;
   }
   .nav-link:hover { color: var(--accent); }
+  .level-up-box {
+    margin-top: 16px; padding: 12px 16px;
+    background: var(--blue-soft); border: 2px solid var(--blue);
+    border-radius: 4px; color: var(--blue); font-weight: 600;
+  }
 </style>
 </head>
 <body>
-<div class="container" id="app"></div>
+<div class="container">
+  <header>
+    <div class="logo">Deutsch · Klasse 7</div>
+    <h1>Rechtschreib-<em>Trainer</em></h1>
+    <div class="subtitle">Doppel-Vokale · Doppel-Konsonanten · Dehnungs-h · Groß/Klein</div>
+  </header>
+  <div id="stats-bar"></div>
+  <div id="app"></div>
+</div>
 <footer>RECHTSCHREIB-TRAINER · FÜR NOAH · KLASSE 7</footer>
 
-<script type="text/babel" src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script>
+"use strict";
 
-<script type="text/babel">
-const { useState, useEffect, useRef } = React;
-
-const AUFGABEN = [
+// ============ AUFGABEN ============
+var AUFGABEN = [
   // DOPPELTE VOKALE - L1
   { kategorie: "Doppelte Vokale", level: 1, wort: "Boot", falsch: ["Bot", "Boht"], satz: "Wir fahren mit dem ___ über den See.", regel: "Doppel-o bei Boot, Moor, Moos." },
   { kategorie: "Doppelte Vokale", level: 1, wort: "Tee", falsch: ["Te", "Teh"], satz: "Ich trinke gerne grünen ___.", regel: "Tee mit Doppel-e." },
@@ -337,432 +342,549 @@ const AUFGABEN = [
   { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "ohne Weiteres", falsch: ["ohne weiteres", "ohne Weitehres"], satz: "Das geht ___.", regel: "Substantiviert → groß: 'ohne Weiteres'." },
   { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "des Öfteren", falsch: ["des öfteren", "des öftehren"], satz: "Wir treffen uns ___.", regel: "Substantiviert → groß: 'des Öfteren'." },
   { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "bei Weitem", falsch: ["bei weitem", "bei Weitehm"], satz: "Er ist ___ der Beste.", regel: "Substantiviert → groß: 'bei Weitem'." },
-  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "Auto fahren", falsch: ["auto fahren", "Autofahren"], satz: "Mein Vater kann gut ___.", regel: "'Auto fahren' getrennt, Auto groß (Nomen)." },
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "Auto fahren", falsch: ["auto fahren", "Autofahren"], satz: "Mein Vater kann gut ___.", regel: "'Auto fahren' getrennt, Auto groß (Nomen)." }
 ];
 
-const MODI = ["multiple", "luecke", "diktat"];
-const ANZAHL_RUNDEN = 12;
-const LEVELS = {
-  1: { name: "Leicht", desc: "Häufige Wörter, klare Regeln", color: "level-1" },
-  2: { name: "Mittel", desc: "Mehr Tücken und Verwechslungen", color: "level-2" },
-  3: { name: "Schwer", desc: "Fremdwörter & Spezialfälle", color: "level-3" },
+var MODI = ["multiple", "luecke", "diktat"];
+var ANZAHL_RUNDEN = 12;
+var LEVELS = {
+  1: { name: "Leicht", desc: "Häufige Wörter, klare Regeln" },
+  2: { name: "Mittel", desc: "Mehr Tücken und Verwechslungen" },
+  3: { name: "Schwer", desc: "Fremdwörter & Spezialfälle" }
 };
-const KATEGORIEN = ["Doppelte Vokale", "Doppelte Konsonanten", "Dehnungs-h", "Groß-/Kleinschreibung"];
+var KATEGORIEN = ["Doppelte Vokale", "Doppelte Konsonanten", "Dehnungs-h", "Groß-/Kleinschreibung"];
 
-const initStats = () => ({
-  sessions: 0, totalRichtig: 0, totalFalsch: 0, bestScore: 0, bestStreak: 0,
-  proKategorie: KATEGORIEN.reduce((acc, k) => ({ ...acc, [k]: { richtig: 0, falsch: 0 } }), {}),
-  proLevel: { 1: { richtig: 0, falsch: 0 }, 2: { richtig: 0, falsch: 0 }, 3: { richtig: 0, falsch: 0 } },
-});
+// ============ STATE ============
+var state = {
+  phase: "start",
+  level: 1,
+  ausgewaehltesLevel: 1,
+  runde: 0,
+  score: 0,
+  streak: 0,
+  aktAufgabe: null,
+  aktModus: null,
+  verwendeteIndizes: [],
+  letzteAntwort: null,
+  fehler: [],
+  fehlerPool: null,
+  antwortStatus: null,
+  eingabe: "",
+  gewaehlt: null,
+  optionen: null,
+  stats: {
+    sessions: 0,
+    totalRichtig: 0,
+    totalFalsch: 0,
+    bestScore: 0,
+    bestStreak: 0,
+    proKategorie: KATEGORIEN.reduce(function(acc, k) { acc[k] = { richtig: 0, falsch: 0 }; return acc; }, {}),
+    proLevel: { 1: { richtig: 0, falsch: 0 }, 2: { richtig: 0, falsch: 0 }, 3: { richtig: 0, falsch: 0 } }
+  }
+};
 
-const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+// ============ HELPERS ============
+function shuffle(arr) {
+  var copy = arr.slice();
+  for (var i = copy.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = copy[i]; copy[i] = copy[j]; copy[j] = tmp;
+  }
+  return copy;
+}
 
 function pickAufgabe(used, level) {
-  const verfuegbar = AUFGABEN.map((a, i) => ({ a, i })).filter(x => x.a.level === level && !used.includes(x.i));
-  if (verfuegbar.length === 0) {
-    const alle = AUFGABEN.map((a, i) => ({ a, i })).filter(x => x.a.level === level);
-    if (alle.length === 0) return null;
-    const pick = alle[Math.floor(Math.random() * alle.length)];
-    return { aufgabe: pick.a, index: pick.i };
+  var verfuegbar = [];
+  for (var i = 0; i < AUFGABEN.length; i++) {
+    if (AUFGABEN[i].level === level && used.indexOf(i) === -1) {
+      verfuegbar.push({ a: AUFGABEN[i], i: i });
+    }
   }
-  const pick = verfuegbar[Math.floor(Math.random() * verfuegbar.length)];
+  if (verfuegbar.length === 0) {
+    var alle = [];
+    for (var k = 0; k < AUFGABEN.length; k++) {
+      if (AUFGABEN[k].level === level) alle.push({ a: AUFGABEN[k], i: k });
+    }
+    if (alle.length === 0) return null;
+    var p = alle[Math.floor(Math.random() * alle.length)];
+    return { aufgabe: p.a, index: p.i };
+  }
+  var pick = verfuegbar[Math.floor(Math.random() * verfuegbar.length)];
   return { aufgabe: pick.a, index: pick.i };
 }
 
 function speak(text) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "de-DE"; u.rate = 0.85;
-  const voices = window.speechSynthesis.getVoices();
-  const deVoice = voices.find(v => v.lang.startsWith("de"));
-  if (deVoice) u.voice = deVoice;
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = "de-DE";
+  u.rate = 0.85;
+  var voices = window.speechSynthesis.getVoices();
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].lang.indexOf("de") === 0) { u.voice = voices[i]; break; }
+  }
   window.speechSynthesis.speak(u);
 }
 
-function Stats({ score, streak, runde, total, level }) {
-  return (
-    <div className="stats">
-      <div className="stat"><div className="stat-label">Punkte</div><div className="stat-value score">{score}</div></div>
-      <div className="stat"><div className="stat-label">Streak 🔥</div><div className="stat-value streak">{streak}</div></div>
-      <div className="stat"><div className="stat-label">Runde</div><div className="stat-value">{runde}/{total}</div></div>
-      <div className="stat"><div className="stat-label">Level</div><div className="stat-value level">{LEVELS[level].name}</div></div>
-    </div>
-  );
+function escapeHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-function StartScreen({ onStart, onShowStats, gesamtStats, ausgewaehltesLevel, setAusgewaehltesLevel }) {
-  return (
-    <div className="card start-screen">
-      <h1>Rechtschreib-<em>Trainer</em></h1>
-      <p style={{marginTop: 16, marginBottom: 8}}>
-        Hi Noah! Wähle dein Level und los geht's.<br/>
-        {ANZAHL_RUNDEN} Aufgaben pro Runde in 3 Modi.
-      </p>
-      <div className="level-cards">
-        {[1, 2, 3].map(l => (
-          <div key={l} className={`level-card ${ausgewaehltesLevel === l ? "selected" : ""}`} onClick={() => setAusgewaehltesLevel(l)}>
-            <div className="level-card-num">{l}</div>
-            <div className="level-card-label">{LEVELS[l].name}</div>
-            <div className="level-card-desc">{LEVELS[l].desc}</div>
-          </div>
-        ))}
-      </div>
-      <button className="btn btn-accent" onClick={onStart}>Los geht's →</button>
-      {gesamtStats.sessions > 0 && (
-        <div><span className="nav-link" onClick={onShowStats}>📊 Meine Statistik ansehen</span></div>
-      )}
-    </div>
-  );
+// ============ STATE UPDATERS ============
+function updateStats(richtig, aufgabe) {
+  if (richtig) state.stats.totalRichtig++; else state.stats.totalFalsch++;
+  state.stats.proKategorie[aufgabe.kategorie][richtig ? "richtig" : "falsch"]++;
+  state.stats.proLevel[aufgabe.level][richtig ? "richtig" : "falsch"]++;
 }
 
-function StatsScreen({ stats, onBack }) {
-  const total = stats.totalRichtig + stats.totalFalsch;
-  const quote = total > 0 ? Math.round((stats.totalRichtig / total) * 100) : 0;
-  const renderBar = (richtig, falsch) => {
-    const ges = richtig + falsch;
-    if (ges === 0) return null;
-    const pct = Math.round((richtig / ges) * 100);
-    const cls = pct >= 75 ? "" : pct >= 50 ? "warn" : "bad";
-    return <div className="cat-stat-bar"><div className={`cat-stat-fill ${cls}`} style={{width: `${pct}%`}}></div></div>;
-  };
-  return (
-    <div className="card">
-      <h2 style={{fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 6}}>Deine Statistik</h2>
-      <p style={{color: "var(--muted)", fontSize: 14, marginBottom: 8}}>Dein Fortschritt über alle Runden in dieser Sitzung.</p>
-      <div className="summary-grid">
-        <div className="summary-tile"><div className="summary-tile-label">Runden</div><div className="summary-tile-value">{stats.sessions}</div></div>
-        <div className="summary-tile"><div className="summary-tile-label">Trefferquote</div><div className="summary-tile-value">{quote}%</div></div>
-        <div className="summary-tile"><div className="summary-tile-label">Beste Punkte</div><div className="summary-tile-value">{stats.bestScore}</div></div>
-        <div className="summary-tile"><div className="summary-tile-label">Beste Streak</div><div className="summary-tile-value">{stats.bestStreak} 🔥</div></div>
-      </div>
-      <div className="stats-block">
-        <h3>Pro Kategorie</h3>
-        {KATEGORIEN.map(k => {
-          const s = stats.proKategorie[k];
-          const ges = s.richtig + s.falsch;
-          const pct = ges > 0 ? Math.round((s.richtig / ges) * 100) : 0;
-          return (
-            <div key={k} className="cat-stat-row">
-              <div className="cat-stat-label">{k}</div>
-              {ges > 0 ? renderBar(s.richtig, s.falsch) : <div className="cat-stat-bar"></div>}
-              <div className="cat-stat-num">{ges > 0 ? `${pct}%` : "–"}</div>
-            </div>
-          );
-        })}
-      </div>
-      <div className="stats-block">
-        <h3>Pro Level</h3>
-        {[1, 2, 3].map(l => {
-          const s = stats.proLevel[l];
-          const ges = s.richtig + s.falsch;
-          const pct = ges > 0 ? Math.round((s.richtig / ges) * 100) : 0;
-          return (
-            <div key={l} className="cat-stat-row">
-              <div className="cat-stat-label">Level {l} – {LEVELS[l].name}</div>
-              {ges > 0 ? renderBar(s.richtig, s.falsch) : <div className="cat-stat-bar"></div>}
-              <div className="cat-stat-num">{ges > 0 ? `${pct}%` : "–"}</div>
-            </div>
-          );
-        })}
-      </div>
-      <button className="btn btn-secondary" onClick={onBack}>← Zurück</button>
-    </div>
-  );
+function naechsteAufgabe() {
+  state.eingabe = "";
+  state.gewaehlt = null;
+  state.antwortStatus = null;
+  state.optionen = null;
+
+  if (state.fehlerPool && state.fehlerPool.length > 0) {
+    var idx = Math.floor(Math.random() * state.fehlerPool.length);
+    state.aktAufgabe = state.fehlerPool[idx];
+    state.fehlerPool.splice(idx, 1);
+  } else {
+    var result = pickAufgabe(state.verwendeteIndizes, state.level);
+    if (!result) { state.phase = "ende"; render(); return; }
+    state.aktAufgabe = result.aufgabe;
+    state.verwendeteIndizes.push(result.index);
+  }
+  state.aktModus = MODI[Math.floor(Math.random() * MODI.length)];
+  if (state.aktModus === "multiple") {
+    state.optionen = shuffle([state.aktAufgabe.wort].concat(state.aktAufgabe.falsch));
+  }
+  state.phase = "spielen";
+  render();
 }
 
-function MultipleChoice({ aufgabe, onAnswer }) {
-  const [gewaehlt, setGewaehlt] = useState(null);
-  const [optionen] = useState(() => shuffle([aufgabe.wort, ...aufgabe.falsch]));
-  const handle = (opt) => {
-    if (gewaehlt) return;
-    setGewaehlt(opt);
-    setTimeout(() => onAnswer(opt === aufgabe.wort, opt), 1200);
-  };
-  return (
-    <div className="card">
-      <div className="mode-badge">Multiple Choice</div>
-      <span className={`level-badge ${LEVELS[aufgabe.level].color}`}>L{aufgabe.level}</span>
-      <span className="category-tag">{aufgabe.kategorie}</span>
-      <div className="question">Welche Schreibweise ist <strong>richtig</strong>?</div>
-      <div className="options">
-        {optionen.map(opt => {
-          let cls = "option";
-          if (gewaehlt) {
-            if (opt === aufgabe.wort) cls += " correct";
-            else if (opt === gewaehlt) cls += " wrong";
-          }
-          return <button key={opt} className={cls} disabled={!!gewaehlt} onClick={() => handle(opt)}>{opt}</button>;
-        })}
-      </div>
-    </div>
-  );
+function start(neuesLevel) {
+  var lvl = (typeof neuesLevel === "number") ? neuesLevel : state.ausgewaehltesLevel;
+  state.level = lvl;
+  state.ausgewaehltesLevel = lvl;
+  state.runde = 1;
+  state.score = 0;
+  state.streak = 0;
+  state.fehler = [];
+  state.verwendeteIndizes = [];
+  state.fehlerPool = null;
+  state.letzteAntwort = null;
+  naechsteAufgabe();
 }
 
-function Lueckentext({ aufgabe, onAnswer }) {
-  const [eingabe, setEingabe] = useState("");
-  const [status, setStatus] = useState(null);
-  const inputRef = useRef(null);
-  useEffect(() => { inputRef.current?.focus(); }, []);
-  const pruefen = () => {
-    if (!eingabe.trim() || status) return;
-    const richtig = eingabe.trim() === aufgabe.wort;
-    setStatus(richtig ? "correct" : "wrong");
-    setTimeout(() => onAnswer(richtig, eingabe.trim()), 1500);
-  };
-  const handleKey = (e) => { if (e.key === "Enter") pruefen(); };
-  const teile = aufgabe.satz.split("___");
-  return (
-    <div className="card">
-      <div className="mode-badge">Lückentext</div>
-      <span className={`level-badge ${LEVELS[aufgabe.level].color}`}>L{aufgabe.level}</span>
-      <span className="category-tag">{aufgabe.kategorie}</span>
-      <div className="question" style={{marginBottom: 12}}>Setze das richtige Wort ein:</div>
-      <div className="lueckentext">
-        {teile[0]}
-        <input ref={inputRef} type="text" value={eingabe} onChange={(e) => setEingabe(e.target.value)} onKeyDown={handleKey} disabled={!!status} className={status === "correct" ? "correct" : status === "wrong" ? "wrong" : ""} placeholder="…" autoComplete="off" spellCheck="false" />
-        {teile[1]}
-      </div>
-      <button className="btn btn-accent" onClick={pruefen} disabled={!!status || !eingabe.trim()}>Prüfen</button>
-    </div>
-  );
+function fehlerUeben() {
+  state.runde = 1;
+  state.score = 0;
+  state.streak = 0;
+  state.verwendeteIndizes = [];
+  var pool = state.fehler.map(function(f) { return f.aufgabe; });
+  state.fehler = [];
+  state.letzteAntwort = null;
+  state.fehlerPool = pool;
+  naechsteAufgabe();
 }
 
-function Diktat({ aufgabe, onAnswer }) {
-  const [eingabe, setEingabe] = useState("");
-  const [status, setStatus] = useState(null);
-  const inputRef = useRef(null);
-  useEffect(() => {
-    if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
-    setTimeout(() => speak(aufgabe.wort), 300);
-    setTimeout(() => inputRef.current?.focus(), 600);
-  }, [aufgabe]);
-  const pruefen = () => {
-    if (!eingabe.trim() || status) return;
-    const richtig = eingabe.trim() === aufgabe.wort;
-    setStatus(richtig ? "correct" : "wrong");
-    setTimeout(() => onAnswer(richtig, eingabe.trim()), 1500);
-  };
-  const handleKey = (e) => { if (e.key === "Enter") pruefen(); };
-  return (
-    <div className="card">
-      <div className="mode-badge">Diktat</div>
-      <span className={`level-badge ${LEVELS[aufgabe.level].color}`}>L{aufgabe.level}</span>
-      <span className="category-tag">{aufgabe.kategorie}</span>
-      <div className="question" style={{marginBottom: 16}}>Hör genau hin und schreibe das Wort richtig auf:</div>
-      <button className="audio-btn" onClick={() => speak(aufgabe.wort)}><span className="icon">🔊</span> Wort anhören</button>
-      <input ref={inputRef} type="text" value={eingabe} onChange={(e) => setEingabe(e.target.value)} onKeyDown={handleKey} disabled={!!status} className={status === "correct" ? "correct" : status === "wrong" ? "wrong" : ""} placeholder="Wort eingeben…" autoComplete="off" spellCheck="false" />
-      <button className="btn btn-accent" onClick={pruefen} disabled={!!status || !eingabe.trim()}>Prüfen</button>
-    </div>
-  );
+function handleAntwort(richtig, eingabe) {
+  updateStats(richtig, state.aktAufgabe);
+  if (richtig) {
+    var punkte = 10 + Math.min(state.streak, 5);
+    state.score += punkte;
+    state.streak += 1;
+    if (state.streak > state.stats.bestStreak) state.stats.bestStreak = state.streak;
+  } else {
+    state.streak = 0;
+    state.fehler.push({ aufgabe: state.aktAufgabe, eingabe: eingabe });
+  }
+  state.letzteAntwort = { richtig: richtig, eingabe: eingabe, aufgabe: state.aktAufgabe };
+  state.phase = "feedback";
+  render();
 }
 
-function Feedback({ richtig, aufgabe, eingabe }) {
-  return (
-    <div className={`feedback ${richtig ? "correct" : "wrong"}`}>
-      {richtig ? (
-        <><strong>✓ Richtig!</strong> Super gemacht.<div className="hint">{aufgabe.regel}</div></>
-      ) : (
-        <><strong>✗ Leider falsch.</strong> Du hast geschrieben: <em>{eingabe}</em><br/>Richtig wäre: <strong>{aufgabe.wort}</strong><div className="hint">{aufgabe.regel}</div></>
-      )}
-    </div>
-  );
+function finalisiereSession() {
+  state.stats.sessions++;
+  if (state.score > state.stats.bestScore) state.stats.bestScore = state.score;
+  state.phase = "ende";
+  render();
 }
 
-function EndScreen({ score, fehler, level, runden, onRestart, onFehlerUeben, onLevelUp, onHome, onShowStats }) {
-  const max = runden * 15;
-  const prozent = Math.round((score / max) * 100);
-  const note = prozent >= 80 ? "Spitzenklasse! 🏆" :
-               prozent >= 60 ? "Sehr gut! 🌟" :
-               prozent >= 40 ? "Gut gemacht! 👍" :
-               prozent >= 20 ? "Weiter üben! 💪" : "Nochmal probieren! 📚";
-  const kannLevelUp = level < 3 && prozent >= 70;
-  return (
-    <div className="card end-screen">
-      <h2>Geschafft!</h2>
-      <div className="big-score">{score}</div>
-      <div style={{fontSize: 14, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.15em", color: "var(--muted)"}}>Punkte · Level {level}</div>
-      <p style={{marginTop: 16, fontSize: 22, fontWeight: 600}}>{note}</p>
-      {kannLevelUp && (
-        <div style={{marginTop: 16, padding: "12px 16px", background: "var(--blue-soft)", border: "2px solid var(--blue)", borderRadius: 4, color: "var(--blue)"}}>
-          <strong>🎯 Bereit für Level {level + 1}?</strong>
-        </div>
-      )}
-      {fehler.length > 0 && (
-        <div className="mistakes-list">
-          <h3>Diese Wörter waren knifflig:</h3>
-          {fehler.map((f, i) => (
-            <div className="word" key={i}>
-              <span className="wrong-mark">{f.eingabe}</span>
-              <span className="right-mark">{f.aufgabe.wort}</span>
-            </div>
-          ))}
-        </div>
-      )}
-      <div className="btn-row" style={{justifyContent: "center"}}>
-        <button className="btn btn-accent" onClick={onRestart}>Neue Runde</button>
-        {kannLevelUp && <button className="btn btn-blue" onClick={onLevelUp}>Level {level + 1} →</button>}
-        {fehler.length > 0 && <button className="btn btn-secondary" onClick={onFehlerUeben}>Fehler üben</button>}
-      </div>
-      <div>
-        <span className="nav-link" onClick={onShowStats}>📊 Statistik</span>
-        <span className="nav-link" onClick={onHome} style={{marginLeft: 16}}>🏠 Start</span>
-      </div>
-    </div>
-  );
+function weiter() {
+  if (state.fehlerPool !== null) {
+    if (state.fehlerPool.length === 0) { finalisiereSession(); return; }
+    state.runde++;
+    state.letzteAntwort = null;
+    naechsteAufgabe();
+    return;
+  }
+  if (state.runde >= ANZAHL_RUNDEN) { finalisiereSession(); return; }
+  state.runde++;
+  state.letzteAntwort = null;
+  naechsteAufgabe();
 }
 
-function App() {
-  const [phase, setPhase] = useState("start");
-  const [level, setLevel] = useState(1);
-  const [ausgewaehltesLevel, setAusgewaehltesLevel] = useState(1);
-  const [runde, setRunde] = useState(0);
-  const [score, setScore] = useState(0);
-  const [streak, setStreak] = useState(0);
-  const [aktAufgabe, setAktAufgabe] = useState(null);
-  const [aktModus, setAktModus] = useState(null);
-  const [verwendeteIndizes, setVerwendeteIndizes] = useState([]);
-  const [letzteAntwort, setLetzteAntwort] = useState(null);
-  const [fehler, setFehler] = useState([]);
-  const [fehlerPool, setFehlerPool] = useState(null);
-  const [gesamtStats, setGesamtStats] = useState(initStats);
+// ============ ACTION HANDLERS ============
+function handleMultipleClick(opt) {
+  if (state.gewaehlt) return;
+  state.gewaehlt = opt;
+  render();
+  setTimeout(function() {
+    handleAntwort(opt === state.aktAufgabe.wort, opt);
+  }, 1200);
+}
 
-  const naechsteAufgabe = () => {
-    if (fehlerPool && fehlerPool.length > 0) {
-      const idx = Math.floor(Math.random() * fehlerPool.length);
-      const aufgabe = fehlerPool[idx];
-      setAktAufgabe(aufgabe);
-      setFehlerPool(fehlerPool.filter((_, i) => i !== idx));
-    } else {
-      const result = pickAufgabe(verwendeteIndizes, level);
-      if (!result) { setPhase("ende"); return; }
-      setAktAufgabe(result.aufgabe);
-      setVerwendeteIndizes(prev => [...prev, result.index]);
+function handlePruefen() {
+  var input = document.getElementById("eingabe-input");
+  if (!input) return;
+  var val = input.value.trim();
+  if (!val || state.antwortStatus) return;
+  state.eingabe = val;
+  var richtig = val === state.aktAufgabe.wort;
+  state.antwortStatus = richtig ? "correct" : "wrong";
+  render();
+  setTimeout(function() {
+    handleAntwort(richtig, val);
+  }, 1500);
+}
+
+function handleEingabeKey(e) {
+  if (e.key === "Enter") handlePruefen();
+}
+
+function selectLevel(l) {
+  state.ausgewaehltesLevel = l;
+  render();
+}
+
+function showStats() {
+  state.phase = "statsView";
+  render();
+}
+
+function backToStart() {
+  state.phase = "start";
+  render();
+}
+
+// ============ RENDERERS ============
+function renderStatsBar() {
+  var bar = document.getElementById("stats-bar");
+  if (state.phase !== "spielen" && state.phase !== "feedback") {
+    bar.innerHTML = "";
+    return;
+  }
+  var totalRunden = state.fehlerPool !== null ? "?" : ANZAHL_RUNDEN;
+  var pct = typeof totalRunden === "number" ? (state.runde / totalRunden) * 100 : 50;
+
+  bar.innerHTML =
+    '<div class="stats">' +
+      '<div class="stat"><div class="stat-label">Punkte</div><div class="stat-value score">' + state.score + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Streak 🔥</div><div class="stat-value streak">' + state.streak + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Runde</div><div class="stat-value">' + state.runde + '/' + totalRunden + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Level</div><div class="stat-value level">' + LEVELS[state.level].name + '</div></div>' +
+    '</div>' +
+    '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
+}
+
+function renderStart() {
+  var levelHtml = "";
+  for (var l = 1; l <= 3; l++) {
+    var sel = state.ausgewaehltesLevel === l ? " selected" : "";
+    levelHtml +=
+      '<div class="level-card' + sel + '" data-level="' + l + '">' +
+        '<div class="level-card-num">' + l + '</div>' +
+        '<div class="level-card-label">' + LEVELS[l].name + '</div>' +
+        '<div class="level-card-desc">' + LEVELS[l].desc + '</div>' +
+      '</div>';
+  }
+  var statsLink = state.stats.sessions > 0
+    ? '<div><button class="nav-link" id="show-stats-btn">📊 Meine Statistik ansehen</button></div>'
+    : '';
+
+  return '<div class="card start-screen">' +
+    '<p style="margin-top:16px;margin-bottom:8px">Hi Noah! Wähle dein Level und los geht\'s.<br/>' + ANZAHL_RUNDEN + ' Aufgaben pro Runde in 3 Modi.</p>' +
+    '<div class="level-cards">' + levelHtml + '</div>' +
+    '<button class="btn btn-accent" id="start-btn">Los geht\'s →</button>' +
+    statsLink +
+  '</div>';
+}
+
+function renderStatsScreen() {
+  var s = state.stats;
+  var total = s.totalRichtig + s.totalFalsch;
+  var quote = total > 0 ? Math.round((s.totalRichtig / total) * 100) : 0;
+
+  function renderBar(richtig, falsch) {
+    var ges = richtig + falsch;
+    if (ges === 0) return '<div class="cat-stat-bar"></div>';
+    var pct = Math.round((richtig / ges) * 100);
+    var cls = pct >= 75 ? "" : pct >= 50 ? "warn" : "bad";
+    return '<div class="cat-stat-bar"><div class="cat-stat-fill ' + cls + '" style="width:' + pct + '%"></div></div>';
+  }
+
+  var katHtml = "";
+  for (var i = 0; i < KATEGORIEN.length; i++) {
+    var k = KATEGORIEN[i];
+    var ks = s.proKategorie[k];
+    var ges = ks.richtig + ks.falsch;
+    var pct = ges > 0 ? Math.round((ks.richtig / ges) * 100) : 0;
+    katHtml +=
+      '<div class="cat-stat-row">' +
+        '<div class="cat-stat-label">' + k + '</div>' +
+        renderBar(ks.richtig, ks.falsch) +
+        '<div class="cat-stat-num">' + (ges > 0 ? pct + "%" : "–") + '</div>' +
+      '</div>';
+  }
+
+  var lvlHtml = "";
+  for (var l = 1; l <= 3; l++) {
+    var ls = s.proLevel[l];
+    var ges2 = ls.richtig + ls.falsch;
+    var pct2 = ges2 > 0 ? Math.round((ls.richtig / ges2) * 100) : 0;
+    lvlHtml +=
+      '<div class="cat-stat-row">' +
+        '<div class="cat-stat-label">Level ' + l + ' – ' + LEVELS[l].name + '</div>' +
+        renderBar(ls.richtig, ls.falsch) +
+        '<div class="cat-stat-num">' + (ges2 > 0 ? pct2 + "%" : "–") + '</div>' +
+      '</div>';
+  }
+
+  return '<div class="card">' +
+    '<h2 style="font-size:28px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px">Deine Statistik</h2>' +
+    '<p style="color:var(--muted);font-size:14px;margin-bottom:8px">Dein Fortschritt über alle Runden in dieser Sitzung.</p>' +
+    '<div class="summary-grid">' +
+      '<div class="summary-tile"><div class="summary-tile-label">Runden</div><div class="summary-tile-value">' + s.sessions + '</div></div>' +
+      '<div class="summary-tile"><div class="summary-tile-label">Trefferquote</div><div class="summary-tile-value">' + quote + '%</div></div>' +
+      '<div class="summary-tile"><div class="summary-tile-label">Beste Punkte</div><div class="summary-tile-value">' + s.bestScore + '</div></div>' +
+      '<div class="summary-tile"><div class="summary-tile-label">Beste Streak</div><div class="summary-tile-value">' + s.bestStreak + ' 🔥</div></div>' +
+    '</div>' +
+    '<div class="stats-block"><h3>Pro Kategorie</h3>' + katHtml + '</div>' +
+    '<div class="stats-block"><h3>Pro Level</h3>' + lvlHtml + '</div>' +
+    '<button class="btn btn-secondary" id="back-btn">← Zurück</button>' +
+  '</div>';
+}
+
+function renderMultiple() {
+  var a = state.aktAufgabe;
+  var optsHtml = "";
+  for (var i = 0; i < state.optionen.length; i++) {
+    var opt = state.optionen[i];
+    var cls = "option";
+    if (state.gewaehlt) {
+      if (opt === a.wort) cls += " correct";
+      else if (opt === state.gewaehlt) cls += " wrong";
     }
-    setAktModus(MODI[Math.floor(Math.random() * MODI.length)]);
-    setPhase("spielen");
-  };
+    var disabled = state.gewaehlt ? " disabled" : "";
+    optsHtml += '<button class="' + cls + '" data-opt="' + escapeHtml(opt) + '"' + disabled + '>' + escapeHtml(opt) + '</button>';
+  }
 
-  const start = (neuesLevel = null) => {
-    const lvl = neuesLevel ?? ausgewaehltesLevel;
-    setLevel(lvl);
-    setAusgewaehltesLevel(lvl);
-    setRunde(1); setScore(0); setStreak(0);
-    setFehler([]); setVerwendeteIndizes([]);
-    setFehlerPool(null); setLetzteAntwort(null);
-    setTimeout(() => {
-      const result = pickAufgabe([], lvl);
-      if (result) {
-        setAktAufgabe(result.aufgabe);
-        setVerwendeteIndizes([result.index]);
-        setAktModus(MODI[Math.floor(Math.random() * MODI.length)]);
-        setPhase("spielen");
-      }
-    }, 50);
-  };
+  return '<div class="card">' +
+    '<div class="mode-badge">Multiple Choice</div>' +
+    '<span class="level-badge level-' + a.level + '">L' + a.level + '</span>' +
+    '<span class="category-tag">' + a.kategorie + '</span>' +
+    '<div class="question">Welche Schreibweise ist <strong>richtig</strong>?</div>' +
+    '<div class="options">' + optsHtml + '</div>' +
+  '</div>';
+}
 
-  const fehlerUeben = () => {
-    setRunde(1); setScore(0); setStreak(0);
-    setVerwendeteIndizes([]);
-    const pool = fehler.map(f => f.aufgabe);
-    setFehler([]); setLetzteAntwort(null);
-    setTimeout(() => {
-      const idx = Math.floor(Math.random() * pool.length);
-      setAktAufgabe(pool[idx]);
-      setFehlerPool(pool.filter((_, i) => i !== idx));
-      setAktModus(MODI[Math.floor(Math.random() * MODI.length)]);
-      setPhase("spielen");
-    }, 50);
-  };
+function renderLuecke() {
+  var a = state.aktAufgabe;
+  var teile = a.satz.split("___");
+  var statusCls = state.antwortStatus === "correct" ? " correct" : state.antwortStatus === "wrong" ? " wrong" : "";
+  var disabled = state.antwortStatus ? " disabled" : "";
+  var val = state.eingabe ? ' value="' + escapeHtml(state.eingabe) + '"' : "";
 
-  const updateStats = (richtig, aufgabe) => {
-    setGesamtStats(prev => {
-      const next = JSON.parse(JSON.stringify(prev));
-      if (richtig) next.totalRichtig++; else next.totalFalsch++;
-      next.proKategorie[aufgabe.kategorie][richtig ? "richtig" : "falsch"]++;
-      next.proLevel[aufgabe.level][richtig ? "richtig" : "falsch"]++;
-      return next;
-    });
-  };
+  return '<div class="card">' +
+    '<div class="mode-badge">Lückentext</div>' +
+    '<span class="level-badge level-' + a.level + '">L' + a.level + '</span>' +
+    '<span class="category-tag">' + a.kategorie + '</span>' +
+    '<div class="question" style="margin-bottom:12px">Setze das richtige Wort ein:</div>' +
+    '<div class="lueckentext">' +
+      escapeHtml(teile[0]) +
+      '<input type="text" id="eingabe-input" class="' + statusCls.trim() + '" placeholder="…" autocomplete="off" spellcheck="false"' + val + disabled + '>' +
+      escapeHtml(teile[1] || "") +
+    '</div>' +
+    '<button class="btn btn-accent" id="pruefen-btn"' + disabled + '>Prüfen</button>' +
+  '</div>';
+}
 
-  const handleAntwort = (richtig, eingabe) => {
-    updateStats(richtig, aktAufgabe);
-    if (richtig) {
-      const punkte = 10 + Math.min(streak, 5);
-      setScore(s => s + punkte);
-      setStreak(s => {
-        const neu = s + 1;
-        setGesamtStats(prev => ({ ...prev, bestStreak: Math.max(prev.bestStreak, neu) }));
-        return neu;
+function renderDiktat() {
+  var a = state.aktAufgabe;
+  var statusCls = state.antwortStatus === "correct" ? " correct" : state.antwortStatus === "wrong" ? " wrong" : "";
+  var disabled = state.antwortStatus ? " disabled" : "";
+  var val = state.eingabe ? ' value="' + escapeHtml(state.eingabe) + '"' : "";
+
+  return '<div class="card">' +
+    '<div class="mode-badge">Diktat</div>' +
+    '<span class="level-badge level-' + a.level + '">L' + a.level + '</span>' +
+    '<span class="category-tag">' + a.kategorie + '</span>' +
+    '<div class="question" style="margin-bottom:16px">Hör genau hin und schreibe das Wort richtig auf:</div>' +
+    '<button class="audio-btn" id="speak-btn"><span class="icon">🔊</span> Wort anhören</button>' +
+    '<input type="text" id="eingabe-input" class="' + statusCls.trim() + '" placeholder="Wort eingeben…" autocomplete="off" spellcheck="false"' + val + disabled + '>' +
+    '<button class="btn btn-accent" id="pruefen-btn"' + disabled + '>Prüfen</button>' +
+  '</div>';
+}
+
+function renderFeedback() {
+  var la = state.letzteAntwort;
+  var cls = la.richtig ? "correct" : "wrong";
+  var content = la.richtig
+    ? '<strong>✓ Richtig!</strong> Super gemacht.<div class="hint">' + escapeHtml(la.aufgabe.regel) + '</div>'
+    : '<strong>✗ Leider falsch.</strong> Du hast geschrieben: <em>' + escapeHtml(la.eingabe) + '</em><br/>Richtig wäre: <strong>' + escapeHtml(la.aufgabe.wort) + '</strong><div class="hint">' + escapeHtml(la.aufgabe.regel) + '</div>';
+
+  // Auch das Aufgaben-Card oben drüber bleibt im Rendering — wir zeigen Aufgabe + Feedback zusammen
+  var aufgabeCard = "";
+  if (state.aktModus === "multiple") aufgabeCard = renderMultiple();
+  else if (state.aktModus === "luecke") aufgabeCard = renderLuecke();
+  else if (state.aktModus === "diktat") aufgabeCard = renderDiktat();
+
+  return aufgabeCard +
+    '<div class="card">' +
+      '<div class="feedback ' + cls + '">' + content + '</div>' +
+      '<button class="btn btn-accent" style="margin-top:20px" id="weiter-btn">Weiter →</button>' +
+    '</div>';
+}
+
+function renderEnde() {
+  var max = ANZAHL_RUNDEN * 15;
+  var prozent = Math.round((state.score / max) * 100);
+  var note = prozent >= 80 ? "Spitzenklasse! 🏆" :
+             prozent >= 60 ? "Sehr gut! 🌟" :
+             prozent >= 40 ? "Gut gemacht! 👍" :
+             prozent >= 20 ? "Weiter üben! 💪" : "Nochmal probieren! 📚";
+  var kannLevelUp = state.level < 3 && prozent >= 70;
+
+  var levelUpHtml = kannLevelUp
+    ? '<div class="level-up-box"><strong>🎯 Bereit für Level ' + (state.level + 1) + '?</strong></div>'
+    : '';
+
+  var fehlerHtml = "";
+  if (state.fehler.length > 0) {
+    var items = "";
+    for (var i = 0; i < state.fehler.length; i++) {
+      var f = state.fehler[i];
+      items += '<div class="word"><span class="wrong-mark">' + escapeHtml(f.eingabe) + '</span><span class="right-mark">' + escapeHtml(f.aufgabe.wort) + '</span></div>';
+    }
+    fehlerHtml = '<div class="mistakes-list"><h3>Diese Wörter waren knifflig:</h3>' + items + '</div>';
+  }
+
+  var btns = '<button class="btn btn-accent" id="restart-btn">Neue Runde</button>';
+  if (kannLevelUp) btns += '<button class="btn btn-blue" id="levelup-btn">Level ' + (state.level + 1) + ' →</button>';
+  if (state.fehler.length > 0) btns += '<button class="btn btn-secondary" id="fehler-btn">Fehler üben</button>';
+
+  return '<div class="card end-screen">' +
+    '<h2>Geschafft!</h2>' +
+    '<div class="big-score">' + state.score + '</div>' +
+    '<div style="font-size:14px;font-family:\'JetBrains Mono\',monospace;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted)">Punkte · Level ' + state.level + '</div>' +
+    '<p style="margin-top:16px;font-size:22px;font-weight:600">' + note + '</p>' +
+    levelUpHtml +
+    fehlerHtml +
+    '<div class="btn-row">' + btns + '</div>' +
+    '<div>' +
+      '<button class="nav-link" id="show-stats-btn">📊 Statistik</button>' +
+      '<button class="nav-link" id="home-btn" style="margin-left:16px">🏠 Start</button>' +
+    '</div>' +
+  '</div>';
+}
+
+// ============ MAIN RENDER ============
+function render() {
+  renderStatsBar();
+  var app = document.getElementById("app");
+  var html = "";
+
+  if (state.phase === "start") html = renderStart();
+  else if (state.phase === "statsView") html = renderStatsScreen();
+  else if (state.phase === "spielen") {
+    if (state.aktModus === "multiple") html = renderMultiple();
+    else if (state.aktModus === "luecke") html = renderLuecke();
+    else if (state.aktModus === "diktat") html = renderDiktat();
+  }
+  else if (state.phase === "feedback") html = renderFeedback();
+  else if (state.phase === "ende") html = renderEnde();
+
+  app.innerHTML = html;
+  attachHandlers();
+
+  // Auto-fokus & Audio
+  if (state.phase === "spielen") {
+    if (state.aktModus === "luecke" || state.aktModus === "diktat") {
+      var inp = document.getElementById("eingabe-input");
+      if (inp) setTimeout(function() { inp.focus(); }, 100);
+    }
+    if (state.aktModus === "diktat") {
+      setTimeout(function() { speak(state.aktAufgabe.wort); }, 300);
+    }
+  }
+}
+
+function attachHandlers() {
+  // Start screen
+  var startBtn = document.getElementById("start-btn");
+  if (startBtn) startBtn.addEventListener("click", function() { start(); });
+
+  var levelCards = document.querySelectorAll(".level-card");
+  for (var i = 0; i < levelCards.length; i++) {
+    (function(card) {
+      card.addEventListener("click", function() {
+        selectLevel(parseInt(card.getAttribute("data-level"), 10));
       });
-    } else {
-      setStreak(0);
-      setFehler(f => [...f, { aufgabe: aktAufgabe, eingabe }]);
-    }
-    setLetzteAntwort({ richtig, eingabe, aufgabe: aktAufgabe });
-    setPhase("feedback");
-  };
+    })(levelCards[i]);
+  }
 
-  const finalisiereSession = () => {
-    setGesamtStats(prev => ({
-      ...prev,
-      sessions: prev.sessions + 1,
-      bestScore: Math.max(prev.bestScore, score),
-    }));
-    setPhase("ende");
-  };
+  var showStatsBtn = document.getElementById("show-stats-btn");
+  if (showStatsBtn) showStatsBtn.addEventListener("click", showStats);
 
-  const weiter = () => {
-    if (fehlerPool !== null) {
-      if (fehlerPool.length === 0) { finalisiereSession(); return; }
-      setRunde(r => r + 1); setLetzteAntwort(null); naechsteAufgabe();
-      return;
-    }
-    if (runde >= ANZAHL_RUNDEN) { finalisiereSession(); return; }
-    setRunde(r => r + 1); setLetzteAntwort(null); naechsteAufgabe();
-  };
+  var backBtn = document.getElementById("back-btn");
+  if (backBtn) backBtn.addEventListener("click", backToStart);
 
-  const totalRunden = fehlerPool !== null ? "?" : ANZAHL_RUNDEN;
-  const progressPct = typeof totalRunden === "number" ? (runde / totalRunden) * 100 : 50;
+  // Multiple choice
+  var optionBtns = document.querySelectorAll(".option");
+  for (var j = 0; j < optionBtns.length; j++) {
+    (function(btn) {
+      btn.addEventListener("click", function() {
+        handleMultipleClick(btn.getAttribute("data-opt"));
+      });
+    })(optionBtns[j]);
+  }
 
-  return (
-    <>
-      <header>
-        <div className="logo">Deutsch · Klasse 7</div>
-        <h1>Rechtschreib-<em>Trainer</em></h1>
-        <div className="subtitle">Doppel-Vokale · Doppel-Konsonanten · Dehnungs-h · Groß/Klein</div>
-      </header>
-      {(phase === "spielen" || phase === "feedback") && (
-        <>
-          <Stats score={score} streak={streak} runde={runde} total={totalRunden} level={level} />
-          <div className="progress-bar"><div className="progress-fill" style={{width: `${progressPct}%`}}></div></div>
-        </>
-      )}
-      {phase === "start" && (
-        <StartScreen onStart={() => start()} onShowStats={() => setPhase("statsView")} gesamtStats={gesamtStats} ausgewaehltesLevel={ausgewaehltesLevel} setAusgewaehltesLevel={setAusgewaehltesLevel} />
-      )}
-      {phase === "statsView" && <StatsScreen stats={gesamtStats} onBack={() => setPhase("start")} />}
-      {phase === "spielen" && aktAufgabe && (
-        <>
-          {aktModus === "multiple" && <MultipleChoice key={runde} aufgabe={aktAufgabe} onAnswer={handleAntwort} />}
-          {aktModus === "luecke" && <Lueckentext key={runde} aufgabe={aktAufgabe} onAnswer={handleAntwort} />}
-          {aktModus === "diktat" && <Diktat key={runde} aufgabe={aktAufgabe} onAnswer={handleAntwort} />}
-        </>
-      )}
-      {phase === "feedback" && letzteAntwort && (
-        <div className="card">
-          <Feedback {...letzteAntwort} />
-          <button className="btn btn-accent" style={{marginTop: 20}} onClick={weiter}>Weiter →</button>
-        </div>
-      )}
-      {phase === "ende" && (
-        <EndScreen score={score} fehler={fehler} level={level} runden={ANZAHL_RUNDEN} onRestart={() => start(level)} onFehlerUeben={fehlerUeben} onLevelUp={() => start(level + 1)} onHome={() => setPhase("start")} onShowStats={() => setPhase("statsView")} />
-      )}
-    </>
-  );
+  // Lückentext / Diktat
+  var pruefenBtn = document.getElementById("pruefen-btn");
+  if (pruefenBtn) pruefenBtn.addEventListener("click", handlePruefen);
+
+  var inp = document.getElementById("eingabe-input");
+  if (inp) inp.addEventListener("keydown", handleEingabeKey);
+
+  var speakBtn = document.getElementById("speak-btn");
+  if (speakBtn) speakBtn.addEventListener("click", function() { speak(state.aktAufgabe.wort); });
+
+  // Feedback
+  var weiterBtn = document.getElementById("weiter-btn");
+  if (weiterBtn) weiterBtn.addEventListener("click", weiter);
+
+  // End screen
+  var restartBtn = document.getElementById("restart-btn");
+  if (restartBtn) restartBtn.addEventListener("click", function() { start(state.level); });
+
+  var levelupBtn = document.getElementById("levelup-btn");
+  if (levelupBtn) levelupBtn.addEventListener("click", function() { start(state.level + 1); });
+
+  var fehlerBtn = document.getElementById("fehler-btn");
+  if (fehlerBtn) fehlerBtn.addEventListener("click", fehlerUeben);
+
+  var homeBtn = document.getElementById("home-btn");
+  if (homeBtn) homeBtn.addEventListener("click", backToStart);
 }
 
-ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+// Stimmen vorladen für Diktat
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+}
+
+// GO
+render();
 </script>
 </body>
 </html>

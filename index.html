@@ -246,6 +246,18 @@
     background: var(--blue-soft); border: 2px solid var(--blue);
     border-radius: 4px; color: var(--blue); font-weight: 600;
   }
+  .tipp-box {
+    margin-bottom: 16px; padding: 10px 14px;
+    background: var(--blue-soft); border: 1px dashed var(--blue);
+    border-radius: 4px; color: var(--blue);
+    font-size: 14px;
+  }
+  .tipp-box code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px; font-weight: 600;
+    background: var(--paper); padding: 2px 8px;
+    border-radius: 3px; margin-left: 4px;
+  }
 </style>
 </head>
 <body>
@@ -266,83 +278,83 @@
 // ============ AUFGABEN ============
 var AUFGABEN = [
   // DOPPELTE VOKALE - L1
-  { kategorie: "Doppelte Vokale", level: 1, wort: "Boot", falsch: ["Bot", "Boht"], satz: "Wir fahren mit dem ___ über den See.", regel: "Doppel-o bei Boot, Moor, Moos." },
-  { kategorie: "Doppelte Vokale", level: 1, wort: "Tee", falsch: ["Te", "Teh"], satz: "Ich trinke gerne grünen ___.", regel: "Tee mit Doppel-e." },
-  { kategorie: "Doppelte Vokale", level: 1, wort: "Haar", falsch: ["Har", "Hahr"], satz: "Sie hat langes blondes ___.", regel: "Haar mit Doppel-a." },
-  { kategorie: "Doppelte Vokale", level: 1, wort: "Paar", falsch: ["Par", "Pahr"], satz: "Ich kaufe ein neues ___ Schuhe.", regel: "Paar (zwei Dinge) mit Doppel-a." },
-  { kategorie: "Doppelte Vokale", level: 1, wort: "Saal", falsch: ["Sal", "Sahl"], satz: "Der ___ war voll besetzt.", regel: "Saal mit Doppel-a (Plural: Säle)." },
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Boot", hinweis: "kleines Schiff", falsch: ["Bot", "Boht"], satz: "Wir fahren mit dem ___ über den See.", regel: "Doppel-o bei Boot, Moor, Moos." },
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Tee", hinweis: "warmes Getränk aus Blättern", falsch: ["Te", "Teh"], satz: "Ich trinke gerne grünen ___.", regel: "Tee mit Doppel-e." },
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Haar", hinweis: "wächst auf dem Kopf", falsch: ["Har", "Hahr"], satz: "Sie hat langes blondes ___.", regel: "Haar mit Doppel-a." },
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Paar", hinweis: "zwei zusammengehörige Dinge", falsch: ["Par", "Pahr"], satz: "Ich kaufe ein neues ___ Schuhe.", regel: "Paar (zwei Dinge) mit Doppel-a." },
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Saal", hinweis: "großer Raum für Veranstaltungen", falsch: ["Sal", "Sahl"], satz: "Der ___ war voll besetzt.", regel: "Saal mit Doppel-a (Plural: Säle)." },
   // DOPPELTE VOKALE - L2
-  { kategorie: "Doppelte Vokale", level: 2, wort: "Meer", falsch: ["Mer", "Mehr"], satz: "Wir machen Urlaub am ___.", regel: "Meer (Ozean) mit Doppel-e – nicht 'mehr'!" },
-  { kategorie: "Doppelte Vokale", level: 2, wort: "Beere", falsch: ["Bere", "Behre"], satz: "Eine reife ___ schmeckt süß.", regel: "Beere mit Doppel-e." },
-  { kategorie: "Doppelte Vokale", level: 2, wort: "Aal", falsch: ["Al", "Ahl"], satz: "Der ___ ist ein langer Fisch.", regel: "Aal mit Doppel-a am Wortanfang." },
-  { kategorie: "Doppelte Vokale", level: 2, wort: "Schnee", falsch: ["Schne", "Schneh"], satz: "Im Winter liegt ___.", regel: "Schnee mit Doppel-e." },
-  { kategorie: "Doppelte Vokale", level: 2, wort: "leer", falsch: ["ler", "lehr"], satz: "Der Tank ist ___.", regel: "leer mit Doppel-e – nicht 'lehr'!" },
+  { kategorie: "Doppelte Vokale", level: 2, wort: "Meer", hinweis: "großes Salzwasser, z.B. Nordsee", falsch: ["Mer", "Mehr"], satz: "Wir machen Urlaub am ___.", regel: "Meer (Ozean) mit Doppel-e – nicht 'mehr'!" },
+  { kategorie: "Doppelte Vokale", level: 2, wort: "Beere", hinweis: "kleine Frucht, z.B. Erdbeere", falsch: ["Bere", "Behre"], satz: "Eine reife ___ schmeckt süß.", regel: "Beere mit Doppel-e." },
+  { kategorie: "Doppelte Vokale", level: 2, wort: "Aal", hinweis: "schlangenartiger Fisch", falsch: ["Al", "Ahl"], satz: "Der ___ ist ein langer Fisch.", regel: "Aal mit Doppel-a am Wortanfang." },
+  { kategorie: "Doppelte Vokale", level: 2, wort: "Schnee", hinweis: "weiße Flocken im Winter", falsch: ["Schne", "Schneh"], satz: "Im Winter liegt ___.", regel: "Schnee mit Doppel-e." },
+  { kategorie: "Doppelte Vokale", level: 2, wort: "leer", hinweis: "nichts mehr drin", falsch: ["ler", "lehr"], satz: "Der Tank ist ___.", regel: "leer mit Doppel-e – nicht 'lehr'!" },
   // DOPPELTE VOKALE - L3
-  { kategorie: "Doppelte Vokale", level: 3, wort: "Staat", falsch: ["Stat", "Staht"], satz: "Deutschland ist ein demokratischer ___.", regel: "Staat (Land) mit Doppel-a – nicht 'Stadt'!" },
-  { kategorie: "Doppelte Vokale", level: 3, wort: "Waage", falsch: ["Wage", "Wahge"], satz: "Stell dich auf die ___.", regel: "Waage mit Doppel-a (zum Wiegen)." },
-  { kategorie: "Doppelte Vokale", level: 3, wort: "Heer", falsch: ["Her", "Hehr"], satz: "Das römische ___ war stark.", regel: "Heer (Armee) mit Doppel-e – nicht 'her'!" },
-  { kategorie: "Doppelte Vokale", level: 3, wort: "Seele", falsch: ["Sele", "Sehle"], satz: "Musik berührt die ___.", regel: "Seele mit Doppel-e." },
-  { kategorie: "Doppelte Vokale", level: 3, wort: "Maat", falsch: ["Mat", "Maht"], satz: "Der ___ ist Offizier auf einem Schiff.", regel: "Maat mit Doppel-a (Seemannssprache)." },
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Staat", hinweis: "ein Land mit Regierung", falsch: ["Stat", "Staht"], satz: "Deutschland ist ein demokratischer ___.", regel: "Staat (Land) mit Doppel-a – nicht 'Stadt'!" },
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Waage", hinweis: "Gerät zum Wiegen", falsch: ["Wage", "Wahge"], satz: "Stell dich auf die ___.", regel: "Waage mit Doppel-a (zum Wiegen)." },
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Heer", hinweis: "die Armee, Soldaten-Truppe", falsch: ["Her", "Hehr"], satz: "Das römische ___ war stark.", regel: "Heer (Armee) mit Doppel-e – nicht 'her'!" },
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Seele", hinweis: "das Innere eines Menschen", falsch: ["Sele", "Sehle"], satz: "Musik berührt die ___.", regel: "Seele mit Doppel-e." },
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Maat", hinweis: "Unteroffizier bei der Marine", falsch: ["Mat", "Maht"], satz: "Der ___ ist Offizier auf einem Schiff.", regel: "Maat mit Doppel-a (Seemannssprache)." },
 
   // DOPPELTE KONSONANTEN - L1
-  { kategorie: "Doppelte Konsonanten", level: 1, wort: "kommen", falsch: ["komen", "kohmen"], satz: "Wir ___ morgen vorbei.", regel: "Kurzer Vokal → Doppel-Konsonant." },
-  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Sonne", falsch: ["Sone", "Sohne"], satz: "Die ___ scheint hell.", regel: "Kurzes o → Doppel-n." },
-  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Sommer", falsch: ["Somer", "Sohmer"], satz: "Im ___ ist es warm.", regel: "Kurzes o → Doppel-m." },
-  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Wasser", falsch: ["Waser", "Wahser"], satz: "Ich trinke ein Glas ___.", regel: "Kurzes a → Doppel-s." },
-  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Mittag", falsch: ["Mitag", "Mihtag"], satz: "Wir essen um zwölf zu ___.", regel: "Kurzes i → Doppel-t." },
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "kommen", hinweis: "Verb: sich nähern, eintreffen", falsch: ["komen", "kohmen"], satz: "Wir ___ morgen vorbei.", regel: "Kurzer Vokal → Doppel-Konsonant." },
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Sonne", hinweis: "scheint am Himmel, macht warm", falsch: ["Sone", "Sohne"], satz: "Die ___ scheint hell.", regel: "Kurzes o → Doppel-n." },
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Sommer", hinweis: "die wärmste Jahreszeit", falsch: ["Somer", "Sohmer"], satz: "Im ___ ist es warm.", regel: "Kurzes o → Doppel-m." },
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Wasser", hinweis: "klare Flüssigkeit zum Trinken", falsch: ["Waser", "Wahser"], satz: "Ich trinke ein Glas ___.", regel: "Kurzes a → Doppel-s." },
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Mittag", hinweis: "die Zeit um 12 Uhr", falsch: ["Mitag", "Mihtag"], satz: "Wir essen um zwölf zu ___.", regel: "Kurzes i → Doppel-t." },
   // DOPPELTE KONSONANTEN - L2
-  { kategorie: "Doppelte Konsonanten", level: 2, wort: "rennen", falsch: ["renen", "rehnen"], satz: "Die Kinder ___ über die Wiese.", regel: "Kurzes e → Doppel-n." },
-  { kategorie: "Doppelte Konsonanten", level: 2, wort: "schwimmen", falsch: ["schwimen", "schwiehmen"], satz: "Ich kann gut ___.", regel: "Kurzes i → Doppel-m." },
-  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Nummer", falsch: ["Numer", "Nuhmer"], satz: "Was ist deine Telefon___?", regel: "Kurzes u → Doppel-m." },
-  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Affe", falsch: ["Afe", "Ahfe"], satz: "Im Zoo lebt ein ___.", regel: "Kurzes a → Doppel-f." },
-  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Kette", falsch: ["Kete", "Kehte"], satz: "Sie trägt eine goldene ___.", regel: "Kurzes e → Doppel-t." },
-  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Treppe", falsch: ["Trepe", "Trehppe"], satz: "Geh die ___ hoch.", regel: "Kurzes e → Doppel-p." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "rennen", hinweis: "Verb: schnell laufen", falsch: ["renen", "rehnen"], satz: "Die Kinder ___ über die Wiese.", regel: "Kurzes e → Doppel-n." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "schwimmen", hinweis: "Verb: sich im Wasser fortbewegen", falsch: ["schwimen", "schwiehmen"], satz: "Ich kann gut ___.", regel: "Kurzes i → Doppel-m." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Nummer", hinweis: "Ziffer / Telefon...", falsch: ["Numer", "Nuhmer"], satz: "Was ist deine Telefon___?", regel: "Kurzes u → Doppel-m." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Affe", hinweis: "Tier im Zoo, mit Schwanz", falsch: ["Afe", "Ahfe"], satz: "Im Zoo lebt ein ___.", regel: "Kurzes a → Doppel-f." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Kette", hinweis: "Schmuck am Hals", falsch: ["Kete", "Kehte"], satz: "Sie trägt eine goldene ___.", regel: "Kurzes e → Doppel-t." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Treppe", hinweis: "Stufen zwischen Etagen", falsch: ["Trepe", "Trehppe"], satz: "Geh die ___ hoch.", regel: "Kurzes e → Doppel-p." },
   // DOPPELTE KONSONANTEN - L3
-  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Kontakt", falsch: ["Konntakt", "Konntackt"], satz: "Bleib mit ihm in ___.", regel: "Nur ein n: Kon-takt (Fremdwort)." },
-  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Adresse", falsch: ["Addresse", "Aderesse"], satz: "Wie ist deine ___?", regel: "Nur ein d: A-dresse (Fremdwort)." },
-  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Kommissar", falsch: ["Komisar", "Kommisar"], satz: "Der ___ ermittelt.", regel: "Doppel-m UND Doppel-s: Kommissar." },
-  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Aggression", falsch: ["Agression", "Aggresion"], satz: "Sport baut ___ ab.", regel: "Doppel-g UND ein s: Aggression." },
-  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Diskussion", falsch: ["Diskusion", "Diskusssion"], satz: "Wir hatten eine lange ___.", regel: "Diskussion mit Doppel-s, ein k." },
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Kontakt", hinweis: "Verbindung zu jemandem", falsch: ["Konntakt", "Konntackt"], satz: "Bleib mit ihm in ___.", regel: "Nur ein n: Kon-takt (Fremdwort)." },
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Adresse", hinweis: "Wohnort: Straße und Hausnummer", falsch: ["Addresse", "Aderesse"], satz: "Wie ist deine ___?", regel: "Nur ein d: A-dresse (Fremdwort)." },
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Kommissar", hinweis: "Polizei-Ermittler, z.B. im Krimi", falsch: ["Komisar", "Kommisar"], satz: "Der ___ ermittelt.", regel: "Doppel-m UND Doppel-s: Kommissar." },
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Aggression", hinweis: "starker Ärger, Wut", falsch: ["Agression", "Aggresion"], satz: "Sport baut ___ ab.", regel: "Doppel-g UND ein s: Aggression." },
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Diskussion", hinweis: "Gespräch mit unterschiedlichen Meinungen", falsch: ["Diskusion", "Diskusssion"], satz: "Wir hatten eine lange ___.", regel: "Diskussion mit Doppel-s, ein k." },
 
   // DEHNUNGS-H - L1
-  { kategorie: "Dehnungs-h", level: 1, wort: "Bahn", falsch: ["Ban", "Baan"], satz: "Ich fahre mit der ___.", regel: "Dehnungs-h vor n: Bahn, Hahn." },
-  { kategorie: "Dehnungs-h", level: 1, wort: "Stuhl", falsch: ["Stul", "Stuul"], satz: "Setz dich auf den ___.", regel: "Dehnungs-h vor l: Stuhl, Mehl." },
-  { kategorie: "Dehnungs-h", level: 1, wort: "wohnen", falsch: ["wonen", "woonen"], satz: "Wir ___ in Rheinstetten.", regel: "Dehnungs-h vor n: wohnen, ohne." },
-  { kategorie: "Dehnungs-h", level: 1, wort: "Zahl", falsch: ["Zal", "Zaal"], satz: "Sieben ist meine Lieblings___.", regel: "Dehnungs-h vor l: Zahl, Wahl." },
-  { kategorie: "Dehnungs-h", level: 1, wort: "Sahne", falsch: ["Sane", "Saane"], satz: "Auf den Kuchen kommt ___.", regel: "Dehnungs-h: Sahne." },
+  { kategorie: "Dehnungs-h", level: 1, wort: "Bahn", hinweis: "Zug / S-Bahn", falsch: ["Ban", "Baan"], satz: "Ich fahre mit der ___.", regel: "Dehnungs-h vor n: Bahn, Hahn." },
+  { kategorie: "Dehnungs-h", level: 1, wort: "Stuhl", hinweis: "Möbel zum Sitzen", falsch: ["Stul", "Stuul"], satz: "Setz dich auf den ___.", regel: "Dehnungs-h vor l: Stuhl, Mehl." },
+  { kategorie: "Dehnungs-h", level: 1, wort: "wohnen", hinweis: "Verb: irgendwo leben", falsch: ["wonen", "woonen"], satz: "Wir ___ in Rheinstetten.", regel: "Dehnungs-h vor n: wohnen, ohne." },
+  { kategorie: "Dehnungs-h", level: 1, wort: "Zahl", hinweis: "z.B. die 7 oder die 13", falsch: ["Zal", "Zaal"], satz: "Sieben ist meine Lieblings___.", regel: "Dehnungs-h vor l: Zahl, Wahl." },
+  { kategorie: "Dehnungs-h", level: 1, wort: "Sahne", hinweis: "weiße Creme aus Milch", falsch: ["Sane", "Saane"], satz: "Auf den Kuchen kommt ___.", regel: "Dehnungs-h: Sahne." },
   // DEHNUNGS-H - L2
-  { kategorie: "Dehnungs-h", level: 2, wort: "Fahrrad", falsch: ["Farrad", "Faarrad"], satz: "Ich fahre mit dem ___ zur Schule.", regel: "Dehnungs-h vor r: Fahrrad, Jahr." },
-  { kategorie: "Dehnungs-h", level: 2, wort: "nehmen", falsch: ["nemen", "neemen"], satz: "Kannst du das Buch ___?", regel: "Dehnungs-h: nehmen, nahm, genommen." },
-  { kategorie: "Dehnungs-h", level: 2, wort: "Lehrer", falsch: ["Lerer", "Leerer"], satz: "Unser ___ ist nett.", regel: "Dehnungs-h: Lehrer, lehren." },
-  { kategorie: "Dehnungs-h", level: 2, wort: "Fehler", falsch: ["Feler", "Feeler"], satz: "Jeder macht mal einen ___.", regel: "Dehnungs-h: Fehler." },
-  { kategorie: "Dehnungs-h", level: 2, wort: "Mühe", falsch: ["Mue", "Müe"], satz: "Das hat mir viel ___ gekostet.", regel: "Dehnungs-h: Mühe, Schuh." },
-  { kategorie: "Dehnungs-h", level: 2, wort: "ihm", falsch: ["im", "iim"], satz: "Ich gebe ___ das Buch.", regel: "Pronomen: ihm, ihn, ihr (mit h)." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "Fahrrad", hinweis: "Zweirad zum Treten", falsch: ["Farrad", "Faarrad"], satz: "Ich fahre mit dem ___ zur Schule.", regel: "Dehnungs-h vor r: Fahrrad, Jahr." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "nehmen", hinweis: "Verb: greifen, mitführen", falsch: ["nemen", "neemen"], satz: "Kannst du das Buch ___?", regel: "Dehnungs-h: nehmen, nahm, genommen." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "Lehrer", hinweis: "unterrichtet in der Schule", falsch: ["Lerer", "Leerer"], satz: "Unser ___ ist nett.", regel: "Dehnungs-h: Lehrer, lehren." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "Fehler", hinweis: "etwas Falsches, ein Irrtum", falsch: ["Feler", "Feeler"], satz: "Jeder macht mal einen ___.", regel: "Dehnungs-h: Fehler." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "Mühe", hinweis: "Anstrengung, harte Arbeit", falsch: ["Mue", "Müe"], satz: "Das hat mir viel ___ gekostet.", regel: "Dehnungs-h: Mühe, Schuh." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "ihm", hinweis: "Pronomen (Dativ): an einen Mann", falsch: ["im", "iim"], satz: "Ich gebe ___ das Buch.", regel: "Pronomen: ihm, ihn, ihr (mit h)." },
   // DEHNUNGS-H - L3
-  { kategorie: "Dehnungs-h", level: 3, wort: "Unwahrheit", falsch: ["Unwarheit", "Unwaarheit"], satz: "Er hat eine ___ gesagt.", regel: "Dehnungs-h in 'Wahrheit', auch zusammengesetzt." },
-  { kategorie: "Dehnungs-h", level: 3, wort: "Kühlschrank", falsch: ["Külschrank", "Kuhlschrank"], satz: "Die Milch steht im ___.", regel: "Umlaut ü mit Dehnungs-h: kühl." },
-  { kategorie: "Dehnungs-h", level: 3, wort: "Wohlstand", falsch: ["Wolstand", "Woolstand"], satz: "Deutschland hat einen hohen ___.", regel: "Dehnungs-h: wohl + Stand." },
-  { kategorie: "Dehnungs-h", level: 3, wort: "vermehren", falsch: ["vermeren", "vermeeren"], satz: "Bakterien ___ sich schnell.", regel: "Dehnungs-h: ver-mehr-en." },
-  { kategorie: "Dehnungs-h", level: 3, wort: "Angehörige", falsch: ["Angeörige", "Angeehörige"], satz: "Die ___ wurden informiert.", regel: "Dehnungs-h: an-ge-hör-en." },
+  { kategorie: "Dehnungs-h", level: 3, wort: "Unwahrheit", hinweis: "eine Lüge", falsch: ["Unwarheit", "Unwaarheit"], satz: "Er hat eine ___ gesagt.", regel: "Dehnungs-h in 'Wahrheit', auch zusammengesetzt." },
+  { kategorie: "Dehnungs-h", level: 3, wort: "Kühlschrank", hinweis: "Küchengerät hält Lebensmittel kalt", falsch: ["Külschrank", "Kuhlschrank"], satz: "Die Milch steht im ___.", regel: "Umlaut ü mit Dehnungs-h: kühl." },
+  { kategorie: "Dehnungs-h", level: 3, wort: "Wohlstand", hinweis: "Reichtum, viel Geld haben", falsch: ["Wolstand", "Woolstand"], satz: "Deutschland hat einen hohen ___.", regel: "Dehnungs-h: wohl + Stand." },
+  { kategorie: "Dehnungs-h", level: 3, wort: "vermehren", hinweis: "Verb: mehr werden, zunehmen", falsch: ["vermeren", "vermeeren"], satz: "Bakterien ___ sich schnell.", regel: "Dehnungs-h: ver-mehr-en." },
+  { kategorie: "Dehnungs-h", level: 3, wort: "Angehörige", hinweis: "Familienmitglieder, Verwandte", falsch: ["Angeörige", "Angeehörige"], satz: "Die ___ wurden informiert.", regel: "Dehnungs-h: an-ge-hör-en." },
 
   // GROSS-/KLEIN - L1
-  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "am besten", falsch: ["am Besten", "am beßten"], satz: "Das machst du ___.", regel: "'am besten' klein – Adjektiv im Superlativ." },
-  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "zum Beispiel", falsch: ["zum beispiel", "zum Beispieel"], satz: "Iss Obst, ___ einen Apfel.", regel: "'Beispiel' ist ein Nomen → groß." },
-  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "auf Deutsch", falsch: ["auf deutsch", "auf Deuhtsch"], satz: "Sag das mal ___.", regel: "Sprache nach Präposition → groß." },
-  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "heute Abend", falsch: ["heute abend", "Heute Abend"], satz: "Wir treffen uns ___.", regel: "Tageszeit nach 'heute/morgen' → groß." },
-  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "Angst haben", falsch: ["angst haben", "angst Haben"], satz: "Ich brauche keine ___.", regel: "'Angst' ist ein Nomen → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "am besten", hinweis: "Superlativ von 'gut'", falsch: ["am Besten", "am beßten"], satz: "Das machst du ___.", regel: "'am besten' klein – Adjektiv im Superlativ." },
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "zum Beispiel", hinweis: "leitet ein Beispiel ein (Abk. z.B.)", falsch: ["zum beispiel", "zum Beispieel"], satz: "Iss Obst, ___ einen Apfel.", regel: "'Beispiel' ist ein Nomen → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "auf Deutsch", hinweis: "in der deutschen Sprache", falsch: ["auf deutsch", "auf Deuhtsch"], satz: "Sag das mal ___.", regel: "Sprache nach Präposition → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "heute Abend", hinweis: "die Zeit nach dem Abendessen, am gleichen Tag", falsch: ["heute abend", "Heute Abend"], satz: "Wir treffen uns ___.", regel: "Tageszeit nach 'heute/morgen' → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "Angst haben", hinweis: "sich fürchten", falsch: ["angst haben", "angst Haben"], satz: "Ich brauche keine ___.", regel: "'Angst' ist ein Nomen → groß." },
   // GROSS-/KLEIN - L2
-  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "Recht haben", falsch: ["recht haben", "recht Haben"], satz: "Du könntest ___.", regel: "'Recht haben' – Recht als Nomen → groß." },
-  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "etwas Neues", falsch: ["etwas neues", "etwas Nehues"], satz: "Ich habe ___ gelernt.", regel: "Nach 'etwas/nichts' → Adjektiv groß." },
-  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "im Voraus", falsch: ["im voraus", "im Vorraus"], satz: "Vielen Dank ___.", regel: "'im Voraus' – Voraus großgeschrieben." },
-  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "im Allgemeinen", falsch: ["im allgemeinen", "im Allgemeihnen"], satz: "___ regnet es hier viel.", regel: "Substantiviertes Adjektiv mit Artikel → groß." },
-  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "Rad fahren", falsch: ["rad fahren", "Radfahren"], satz: "Ich gehe ___.", regel: "'Rad fahren' – getrennt, Rad groß." },
-  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "Acht geben", falsch: ["acht geben", "achtgeben"], satz: "Du musst ___ im Straßenverkehr.", regel: "'Acht geben' – Acht als Nomen, getrennt." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "Recht haben", hinweis: "die richtige Meinung haben", falsch: ["recht haben", "recht Haben"], satz: "Du könntest ___.", regel: "'Recht haben' – Recht als Nomen → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "etwas Neues", hinweis: "eine neue Sache", falsch: ["etwas neues", "etwas Nehues"], satz: "Ich habe ___ gelernt.", regel: "Nach 'etwas/nichts' → Adjektiv groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "im Voraus", hinweis: "schon vorher, bevor etwas passiert", falsch: ["im voraus", "im Vorraus"], satz: "Vielen Dank ___.", regel: "'im Voraus' – Voraus großgeschrieben." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "im Allgemeinen", hinweis: "meistens, normalerweise", falsch: ["im allgemeinen", "im Allgemeihnen"], satz: "___ regnet es hier viel.", regel: "Substantiviertes Adjektiv mit Artikel → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "Rad fahren", hinweis: "mit dem Fahrrad unterwegs sein", falsch: ["rad fahren", "Radfahren"], satz: "Ich gehe ___.", regel: "'Rad fahren' – getrennt, Rad groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "Acht geben", hinweis: "aufpassen, vorsichtig sein", falsch: ["acht geben", "achtgeben"], satz: "Du musst ___ im Straßenverkehr.", regel: "'Acht geben' – Acht als Nomen, getrennt." },
   // GROSS-/KLEIN - L3
-  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "des Weiteren", falsch: ["des weiteren", "des Weitehren"], satz: "___ möchte ich sagen, dass …", regel: "Substantiviert → groß: 'des Weiteren'." },
-  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "ohne Weiteres", falsch: ["ohne weiteres", "ohne Weitehres"], satz: "Das geht ___.", regel: "Substantiviert → groß: 'ohne Weiteres'." },
-  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "des Öfteren", falsch: ["des öfteren", "des öftehren"], satz: "Wir treffen uns ___.", regel: "Substantiviert → groß: 'des Öfteren'." },
-  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "bei Weitem", falsch: ["bei weitem", "bei Weitehm"], satz: "Er ist ___ der Beste.", regel: "Substantiviert → groß: 'bei Weitem'." },
-  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "Auto fahren", falsch: ["auto fahren", "Autofahren"], satz: "Mein Vater kann gut ___.", regel: "'Auto fahren' getrennt, Auto groß (Nomen)." }
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "des Weiteren", hinweis: "außerdem (förmlich)", falsch: ["des weiteren", "des Weitehren"], satz: "___ möchte ich sagen, dass …", regel: "Substantiviert → groß: 'des Weiteren'." },
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "ohne Weiteres", hinweis: "ohne Probleme, einfach so", falsch: ["ohne weiteres", "ohne Weitehres"], satz: "Das geht ___.", regel: "Substantiviert → groß: 'ohne Weiteres'." },
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "des Öfteren", hinweis: "öfter, häufiger", falsch: ["des öfteren", "des öftehren"], satz: "Wir treffen uns ___.", regel: "Substantiviert → groß: 'des Öfteren'." },
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "bei Weitem", hinweis: "viel mehr als andere (Steigerung)", falsch: ["bei weitem", "bei Weitehm"], satz: "Er ist ___ der Beste.", regel: "Substantiviert → groß: 'bei Weitem'." },
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "Auto fahren", hinweis: "ein Kfz lenken", falsch: ["auto fahren", "Autofahren"], satz: "Mein Vater kann gut ___.", regel: "'Auto fahren' getrennt, Auto groß (Nomen)." }
 ];
 
 var MODI = ["multiple", "luecke", "diktat"];
@@ -428,6 +440,26 @@ function speak(text) {
 
 function escapeHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+// Erzeugt einen Tipp wie "B___t" oder "am b___n" für ein Zielwort
+function makeTipp(wort) {
+  // Mehrwort-Ausdrücke: erstes Wort komplett zeigen, letztes Wort als Muster
+  if (wort.indexOf(" ") > -1) {
+    var teile = wort.split(" ");
+    var letztes = teile[teile.length - 1];
+    var muster = maskWort(letztes);
+    teile[teile.length - 1] = muster;
+    return teile.join(" ");
+  }
+  return maskWort(wort);
+}
+
+function maskWort(w) {
+  if (w.length <= 2) return w.charAt(0) + "…";
+  if (w.length === 3) return w.charAt(0) + "_" + w.charAt(w.length - 1);
+  // ≥ 4 Buchstaben: ersten + letzten Buchstaben zeigen, Mitte maskieren
+  return w.charAt(0) + "___" + w.charAt(w.length - 1);
 }
 
 // ============ STATE UPDATERS ============
@@ -705,6 +737,7 @@ function renderLuecke() {
       '<input type="text" id="eingabe-input" class="' + statusCls.trim() + '" placeholder="…" autocomplete="off" spellcheck="false"' + val + disabled + '>' +
       escapeHtml(teile[1] || "") +
     '</div>' +
+    '<div class="tipp-box">💡 Gesuchtes Wort: <em>' + escapeHtml(a.hinweis) + '</em></div>' +
     '<button class="btn btn-accent" id="pruefen-btn"' + disabled + '>Prüfen</button>' +
   '</div>';
 }
@@ -714,6 +747,11 @@ function renderDiktat() {
   var statusCls = state.antwortStatus === "correct" ? " correct" : state.antwortStatus === "wrong" ? " wrong" : "";
   var disabled = state.antwortStatus ? " disabled" : "";
   var val = state.eingabe ? ' value="' + escapeHtml(state.eingabe) + '"' : "";
+  var anzBuchstaben = a.wort.replace(/ /g, "").length;
+  var anzWoerter = a.wort.split(" ").length;
+  var lenHint = anzWoerter > 1
+    ? anzWoerter + " Wörter, " + anzBuchstaben + " Buchstaben"
+    : anzBuchstaben + " Buchstaben";
 
   return '<div class="card">' +
     '<div class="mode-badge">Diktat</div>' +
@@ -722,6 +760,7 @@ function renderDiktat() {
     '<div class="question" style="margin-bottom:16px">Hör genau hin und schreibe das Wort richtig auf:</div>' +
     '<button class="audio-btn" id="speak-btn"><span class="icon">🔊</span> Wort anhören</button>' +
     '<input type="text" id="eingabe-input" class="' + statusCls.trim() + '" placeholder="Wort eingeben…" autocomplete="off" spellcheck="false"' + val + disabled + '>' +
+    '<div class="tipp-box">💡 Bedeutung: <em>' + escapeHtml(a.hinweis) + '</em> &nbsp;·&nbsp; <code>' + lenHint + '</code></div>' +
     '<button class="btn btn-accent" id="pruefen-btn"' + disabled + '>Prüfen</button>' +
   '</div>';
 }

@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rechtschreib-Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fef8ee;
+    --ink: #1a1614;
+    --paper: #ffffff;
+    --accent: #ff5b22;
+    --accent-soft: #ffe8dd;
+    --green: #2d7d4f;
+    --green-soft: #d4edd9;
+    --red: #c63030;
+    --red-soft: #fad9d9;
+    --blue: #2c5282;
+    --blue-soft: #d6e4f0;
+    --muted: #8a807a;
+    --line: #e8ddd0;
+    --shadow: 4px 4px 0 var(--ink);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Fraunces', Georgia, serif;
+    background: var(--bg); color: var(--ink);
+    min-height: 100vh; padding: 24px 16px;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(255,91,34,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(45,125,79,0.04) 0%, transparent 40%);
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 32px; padding: 24px 16px 8px; }
+  .logo {
+    font-size: 12px; font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.2em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif; font-weight: 800;
+    font-size: clamp(36px, 7vw, 56px); line-height: 1;
+    letter-spacing: -0.02em; font-variation-settings: "opsz" 144;
+  }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .subtitle { margin-top: 8px; color: var(--muted); font-size: 16px; font-style: italic; }
+  .stats { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stat {
+    flex: 1; min-width: 90px; background: var(--paper);
+    border: 2px solid var(--ink); box-shadow: var(--shadow);
+    padding: 12px 14px; border-radius: 4px;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted);
+  }
+  .stat-value {
+    font-size: 28px; font-weight: 800; line-height: 1.1;
+    margin-top: 4px; font-variation-settings: "opsz" 144;
+  }
+  .stat-value.streak { color: var(--accent); }
+  .stat-value.score { color: var(--green); }
+  .stat-value.level { color: var(--blue); font-size: 18px; padding-top: 6px; }
+  .level-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 12px; font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    font-weight: 600; margin-left: 8px; vertical-align: middle;
+  }
+  .level-1 { background: var(--green-soft); color: var(--green); }
+  .level-2 { background: var(--accent-soft); color: var(--accent); }
+  .level-3 { background: var(--red-soft); color: var(--red); }
+  .card {
+    background: var(--paper); border: 2px solid var(--ink);
+    box-shadow: var(--shadow); padding: 32px 24px;
+    border-radius: 4px; margin-bottom: 20px;
+  }
+  .mode-badge {
+    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em;
+    background: var(--ink); color: var(--bg); padding: 4px 10px;
+    border-radius: 2px; margin-bottom: 16px;
+  }
+  .category-tag {
+    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted); margin-left: 8px;
+  }
+  .question { font-size: 18px; margin-bottom: 24px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    background: var(--bg); border: 2px solid var(--ink);
+    padding: 16px 20px; border-radius: 4px;
+    font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600;
+    text-align: left; cursor: pointer; transition: all 0.15s ease; color: var(--ink);
+  }
+  .option:hover:not(:disabled) {
+    transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink);
+    background: var(--accent-soft);
+  }
+  .option:disabled { cursor: default; }
+  .option.correct { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+  .option.wrong { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+  input[type="text"] {
+    width: 100%; background: var(--bg); border: 2px solid var(--ink);
+    padding: 16px 20px; border-radius: 4px;
+    font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600;
+    color: var(--ink); margin-bottom: 16px;
+  }
+  input[type="text"]:focus { outline: none; box-shadow: var(--shadow); background: var(--paper); }
+  input.correct { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+  input.wrong { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+  .lueckentext {
+    font-size: 26px; font-weight: 600; line-height: 1.6;
+    margin-bottom: 24px; letter-spacing: -0.01em;
+  }
+  .lueckentext input {
+    display: inline-block; width: auto; min-width: 100px;
+    font-size: 26px; padding: 4px 12px; margin: 0 4px; text-align: center;
+  }
+  .btn {
+    background: var(--ink); color: var(--bg); border: 2px solid var(--ink);
+    padding: 14px 24px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: var(--shadow); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-accent { background: var(--accent); border-color: var(--accent); }
+  .btn-secondary { background: var(--paper); color: var(--ink); }
+  .btn-blue { background: var(--blue); border-color: var(--blue); }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .feedback {
+    margin-top: 20px; padding: 16px 20px; border-radius: 4px;
+    border: 2px solid; font-size: 16px; line-height: 1.5;
+  }
+  .feedback.correct { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+  .feedback.wrong { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+  .feedback strong { font-weight: 800; }
+  .hint { font-style: italic; margin-top: 8px; font-size: 15px; opacity: 0.85; }
+  .audio-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: white; border: 2px solid var(--ink);
+    padding: 18px 28px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    cursor: pointer; transition: all 0.15s ease; margin-bottom: 20px;
+  }
+  .audio-btn:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow); }
+  .audio-btn .icon { font-size: 20px; }
+  .start-screen { text-align: center; padding: 40px 24px; }
+  .start-screen p { font-size: 17px; line-height: 1.6; margin-bottom: 16px; color: var(--muted); }
+  .level-cards { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 20px 0; }
+  @media (min-width: 600px) { .level-cards { grid-template-columns: repeat(3, 1fr); } }
+  .level-card {
+    background: var(--bg); border: 2px solid var(--ink);
+    padding: 20px 16px; border-radius: 4px;
+    cursor: pointer; transition: all 0.15s ease; text-align: left;
+  }
+  .level-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow); }
+  .level-card.selected { background: var(--accent-soft); border-color: var(--accent); }
+  .level-card-num {
+    font-size: 28px; font-weight: 800; line-height: 1;
+    font-variation-settings: "opsz" 144; margin-bottom: 4px;
+  }
+  .level-card-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .level-card-desc { font-size: 14px; line-height: 1.4; color: var(--ink); }
+  .progress-bar {
+    height: 6px; background: var(--line); border-radius: 3px;
+    overflow: hidden; margin-bottom: 24px;
+  }
+  .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; }
+  .end-screen { text-align: center; padding: 32px 16px; }
+  .end-screen h2 {
+    font-size: 36px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em;
+  }
+  .end-screen .big-score {
+    font-size: 72px; font-weight: 800; color: var(--accent);
+    line-height: 1; margin: 24px 0 8px; font-variation-settings: "opsz" 144;
+  }
+  .mistakes-list, .stats-block {
+    text-align: left; background: var(--bg);
+    border: 2px solid var(--line); padding: 20px;
+    border-radius: 4px; margin: 24px 0;
+  }
+  .mistakes-list h3, .stats-block h3 {
+    font-size: 13px; font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--muted); margin-bottom: 14px;
+  }
+  .mistakes-list .word {
+    font-size: 18px; font-weight: 600; padding: 8px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .mistakes-list .word:last-child { border-bottom: none; }
+  .mistakes-list .word .wrong-mark { color: var(--red); text-decoration: line-through; margin-right: 12px; }
+  .mistakes-list .word .right-mark { color: var(--green); }
+  .cat-stat-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 10px; font-size: 14px;
+  }
+  .cat-stat-row:last-child { margin-bottom: 0; }
+  .cat-stat-label { flex: 0 0 145px; font-weight: 600; }
+  .cat-stat-bar {
+    flex: 1; height: 22px; background: var(--paper);
+    border: 1px solid var(--ink); border-radius: 3px;
+    overflow: hidden; position: relative;
+  }
+  .cat-stat-fill { height: 100%; background: var(--green); transition: width 0.6s ease; }
+  .cat-stat-fill.warn { background: var(--accent); }
+  .cat-stat-fill.bad { background: var(--red); }
+  .cat-stat-num {
+    flex: 0 0 60px; text-align: right;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted);
+  }
+  .summary-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 12px; margin: 16px 0;
+  }
+  .summary-tile {
+    background: var(--paper); border: 1px solid var(--line);
+    padding: 12px; border-radius: 4px;
+  }
+  .summary-tile-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted);
+  }
+  .summary-tile-value { font-size: 22px; font-weight: 800; margin-top: 2px; }
+  footer {
+    text-align: center; margin-top: 40px; padding: 16px;
+    font-size: 12px; font-family: 'JetBrains Mono', monospace;
+    color: var(--muted); letter-spacing: 0.1em;
+  }
+  .nav-link {
+    display: inline-block; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    text-decoration: underline; cursor: pointer; margin-top: 12px;
+  }
+  .nav-link:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="container" id="app"></div>
+<footer>RECHTSCHREIB-TRAINER · FÜR NOAH · KLASSE 7</footer>
+
+<script type="text/babel" src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const AUFGABEN = [
+  // DOPPELTE VOKALE - L1
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Boot", falsch: ["Bot", "Boht"], satz: "Wir fahren mit dem ___ über den See.", regel: "Doppel-o bei Boot, Moor, Moos." },
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Tee", falsch: ["Te", "Teh"], satz: "Ich trinke gerne grünen ___.", regel: "Tee mit Doppel-e." },
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Haar", falsch: ["Har", "Hahr"], satz: "Sie hat langes blondes ___.", regel: "Haar mit Doppel-a." },
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Paar", falsch: ["Par", "Pahr"], satz: "Ich kaufe ein neues ___ Schuhe.", regel: "Paar (zwei Dinge) mit Doppel-a." },
+  { kategorie: "Doppelte Vokale", level: 1, wort: "Saal", falsch: ["Sal", "Sahl"], satz: "Der ___ war voll besetzt.", regel: "Saal mit Doppel-a (Plural: Säle)." },
+  // DOPPELTE VOKALE - L2
+  { kategorie: "Doppelte Vokale", level: 2, wort: "Meer", falsch: ["Mer", "Mehr"], satz: "Wir machen Urlaub am ___.", regel: "Meer (Ozean) mit Doppel-e – nicht 'mehr'!" },
+  { kategorie: "Doppelte Vokale", level: 2, wort: "Beere", falsch: ["Bere", "Behre"], satz: "Eine reife ___ schmeckt süß.", regel: "Beere mit Doppel-e." },
+  { kategorie: "Doppelte Vokale", level: 2, wort: "Aal", falsch: ["Al", "Ahl"], satz: "Der ___ ist ein langer Fisch.", regel: "Aal mit Doppel-a am Wortanfang." },
+  { kategorie: "Doppelte Vokale", level: 2, wort: "Schnee", falsch: ["Schne", "Schneh"], satz: "Im Winter liegt ___.", regel: "Schnee mit Doppel-e." },
+  { kategorie: "Doppelte Vokale", level: 2, wort: "leer", falsch: ["ler", "lehr"], satz: "Der Tank ist ___.", regel: "leer mit Doppel-e – nicht 'lehr'!" },
+  // DOPPELTE VOKALE - L3
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Staat", falsch: ["Stat", "Staht"], satz: "Deutschland ist ein demokratischer ___.", regel: "Staat (Land) mit Doppel-a – nicht 'Stadt'!" },
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Waage", falsch: ["Wage", "Wahge"], satz: "Stell dich auf die ___.", regel: "Waage mit Doppel-a (zum Wiegen)." },
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Heer", falsch: ["Her", "Hehr"], satz: "Das römische ___ war stark.", regel: "Heer (Armee) mit Doppel-e – nicht 'her'!" },
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Seele", falsch: ["Sele", "Sehle"], satz: "Musik berührt die ___.", regel: "Seele mit Doppel-e." },
+  { kategorie: "Doppelte Vokale", level: 3, wort: "Maat", falsch: ["Mat", "Maht"], satz: "Der ___ ist Offizier auf einem Schiff.", regel: "Maat mit Doppel-a (Seemannssprache)." },
+
+  // DOPPELTE KONSONANTEN - L1
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "kommen", falsch: ["komen", "kohmen"], satz: "Wir ___ morgen vorbei.", regel: "Kurzer Vokal → Doppel-Konsonant." },
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Sonne", falsch: ["Sone", "Sohne"], satz: "Die ___ scheint hell.", regel: "Kurzes o → Doppel-n." },
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Sommer", falsch: ["Somer", "Sohmer"], satz: "Im ___ ist es warm.", regel: "Kurzes o → Doppel-m." },
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Wasser", falsch: ["Waser", "Wahser"], satz: "Ich trinke ein Glas ___.", regel: "Kurzes a → Doppel-s." },
+  { kategorie: "Doppelte Konsonanten", level: 1, wort: "Mittag", falsch: ["Mitag", "Mihtag"], satz: "Wir essen um zwölf zu ___.", regel: "Kurzes i → Doppel-t." },
+  // DOPPELTE KONSONANTEN - L2
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "rennen", falsch: ["renen", "rehnen"], satz: "Die Kinder ___ über die Wiese.", regel: "Kurzes e → Doppel-n." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "schwimmen", falsch: ["schwimen", "schwiehmen"], satz: "Ich kann gut ___.", regel: "Kurzes i → Doppel-m." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Nummer", falsch: ["Numer", "Nuhmer"], satz: "Was ist deine Telefon___?", regel: "Kurzes u → Doppel-m." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Affe", falsch: ["Afe", "Ahfe"], satz: "Im Zoo lebt ein ___.", regel: "Kurzes a → Doppel-f." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Kette", falsch: ["Kete", "Kehte"], satz: "Sie trägt eine goldene ___.", regel: "Kurzes e → Doppel-t." },
+  { kategorie: "Doppelte Konsonanten", level: 2, wort: "Treppe", falsch: ["Trepe", "Trehppe"], satz: "Geh die ___ hoch.", regel: "Kurzes e → Doppel-p." },
+  // DOPPELTE KONSONANTEN - L3
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Kontakt", falsch: ["Konntakt", "Konntackt"], satz: "Bleib mit ihm in ___.", regel: "Nur ein n: Kon-takt (Fremdwort)." },
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Adresse", falsch: ["Addresse", "Aderesse"], satz: "Wie ist deine ___?", regel: "Nur ein d: A-dresse (Fremdwort)." },
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Kommissar", falsch: ["Komisar", "Kommisar"], satz: "Der ___ ermittelt.", regel: "Doppel-m UND Doppel-s: Kommissar." },
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Aggression", falsch: ["Agression", "Aggresion"], satz: "Sport baut ___ ab.", regel: "Doppel-g UND ein s: Aggression." },
+  { kategorie: "Doppelte Konsonanten", level: 3, wort: "Diskussion", falsch: ["Diskusion", "Diskusssion"], satz: "Wir hatten eine lange ___.", regel: "Diskussion mit Doppel-s, ein k." },
+
+  // DEHNUNGS-H - L1
+  { kategorie: "Dehnungs-h", level: 1, wort: "Bahn", falsch: ["Ban", "Baan"], satz: "Ich fahre mit der ___.", regel: "Dehnungs-h vor n: Bahn, Hahn." },
+  { kategorie: "Dehnungs-h", level: 1, wort: "Stuhl", falsch: ["Stul", "Stuul"], satz: "Setz dich auf den ___.", regel: "Dehnungs-h vor l: Stuhl, Mehl." },
+  { kategorie: "Dehnungs-h", level: 1, wort: "wohnen", falsch: ["wonen", "woonen"], satz: "Wir ___ in Rheinstetten.", regel: "Dehnungs-h vor n: wohnen, ohne." },
+  { kategorie: "Dehnungs-h", level: 1, wort: "Zahl", falsch: ["Zal", "Zaal"], satz: "Sieben ist meine Lieblings___.", regel: "Dehnungs-h vor l: Zahl, Wahl." },
+  { kategorie: "Dehnungs-h", level: 1, wort: "Sahne", falsch: ["Sane", "Saane"], satz: "Auf den Kuchen kommt ___.", regel: "Dehnungs-h: Sahne." },
+  // DEHNUNGS-H - L2
+  { kategorie: "Dehnungs-h", level: 2, wort: "Fahrrad", falsch: ["Farrad", "Faarrad"], satz: "Ich fahre mit dem ___ zur Schule.", regel: "Dehnungs-h vor r: Fahrrad, Jahr." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "nehmen", falsch: ["nemen", "neemen"], satz: "Kannst du das Buch ___?", regel: "Dehnungs-h: nehmen, nahm, genommen." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "Lehrer", falsch: ["Lerer", "Leerer"], satz: "Unser ___ ist nett.", regel: "Dehnungs-h: Lehrer, lehren." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "Fehler", falsch: ["Feler", "Feeler"], satz: "Jeder macht mal einen ___.", regel: "Dehnungs-h: Fehler." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "Mühe", falsch: ["Mue", "Müe"], satz: "Das hat mir viel ___ gekostet.", regel: "Dehnungs-h: Mühe, Schuh." },
+  { kategorie: "Dehnungs-h", level: 2, wort: "ihm", falsch: ["im", "iim"], satz: "Ich gebe ___ das Buch.", regel: "Pronomen: ihm, ihn, ihr (mit h)." },
+  // DEHNUNGS-H - L3
+  { kategorie: "Dehnungs-h", level: 3, wort: "Unwahrheit", falsch: ["Unwarheit", "Unwaarheit"], satz: "Er hat eine ___ gesagt.", regel: "Dehnungs-h in 'Wahrheit', auch zusammengesetzt." },
+  { kategorie: "Dehnungs-h", level: 3, wort: "Kühlschrank", falsch: ["Külschrank", "Kuhlschrank"], satz: "Die Milch steht im ___.", regel: "Umlaut ü mit Dehnungs-h: kühl." },
+  { kategorie: "Dehnungs-h", level: 3, wort: "Wohlstand", falsch: ["Wolstand", "Woolstand"], satz: "Deutschland hat einen hohen ___.", regel: "Dehnungs-h: wohl + Stand." },
+  { kategorie: "Dehnungs-h", level: 3, wort: "vermehren", falsch: ["vermeren", "vermeeren"], satz: "Bakterien ___ sich schnell.", regel: "Dehnungs-h: ver-mehr-en." },
+  { kategorie: "Dehnungs-h", level: 3, wort: "Angehörige", falsch: ["Angeörige", "Angeehörige"], satz: "Die ___ wurden informiert.", regel: "Dehnungs-h: an-ge-hör-en." },
+
+  // GROSS-/KLEIN - L1
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "am besten", falsch: ["am Besten", "am beßten"], satz: "Das machst du ___.", regel: "'am besten' klein – Adjektiv im Superlativ." },
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "zum Beispiel", falsch: ["zum beispiel", "zum Beispieel"], satz: "Iss Obst, ___ einen Apfel.", regel: "'Beispiel' ist ein Nomen → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "auf Deutsch", falsch: ["auf deutsch", "auf Deuhtsch"], satz: "Sag das mal ___.", regel: "Sprache nach Präposition → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "heute Abend", falsch: ["heute abend", "Heute Abend"], satz: "Wir treffen uns ___.", regel: "Tageszeit nach 'heute/morgen' → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 1, wort: "Angst haben", falsch: ["angst haben", "angst Haben"], satz: "Ich brauche keine ___.", regel: "'Angst' ist ein Nomen → groß." },
+  // GROSS-/KLEIN - L2
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "Recht haben", falsch: ["recht haben", "recht Haben"], satz: "Du könntest ___.", regel: "'Recht haben' – Recht als Nomen → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "etwas Neues", falsch: ["etwas neues", "etwas Nehues"], satz: "Ich habe ___ gelernt.", regel: "Nach 'etwas/nichts' → Adjektiv groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "im Voraus", falsch: ["im voraus", "im Vorraus"], satz: "Vielen Dank ___.", regel: "'im Voraus' – Voraus großgeschrieben." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "im Allgemeinen", falsch: ["im allgemeinen", "im Allgemeihnen"], satz: "___ regnet es hier viel.", regel: "Substantiviertes Adjektiv mit Artikel → groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "Rad fahren", falsch: ["rad fahren", "Radfahren"], satz: "Ich gehe ___.", regel: "'Rad fahren' – getrennt, Rad groß." },
+  { kategorie: "Groß-/Kleinschreibung", level: 2, wort: "Acht geben", falsch: ["acht geben", "achtgeben"], satz: "Du musst ___ im Straßenverkehr.", regel: "'Acht geben' – Acht als Nomen, getrennt." },
+  // GROSS-/KLEIN - L3
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "des Weiteren", falsch: ["des weiteren", "des Weitehren"], satz: "___ möchte ich sagen, dass …", regel: "Substantiviert → groß: 'des Weiteren'." },
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "ohne Weiteres", falsch: ["ohne weiteres", "ohne Weitehres"], satz: "Das geht ___.", regel: "Substantiviert → groß: 'ohne Weiteres'." },
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "des Öfteren", falsch: ["des öfteren", "des öftehren"], satz: "Wir treffen uns ___.", regel: "Substantiviert → groß: 'des Öfteren'." },
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "bei Weitem", falsch: ["bei weitem", "bei Weitehm"], satz: "Er ist ___ der Beste.", regel: "Substantiviert → groß: 'bei Weitem'." },
+  { kategorie: "Groß-/Kleinschreibung", level: 3, wort: "Auto fahren", falsch: ["auto fahren", "Autofahren"], satz: "Mein Vater kann gut ___.", regel: "'Auto fahren' getrennt, Auto groß (Nomen)." },
+];
+
+const MODI = ["multiple", "luecke", "diktat"];
+const ANZAHL_RUNDEN = 12;
+const LEVELS = {
+  1: { name: "Leicht", desc: "Häufige Wörter, klare Regeln", color: "level-1" },
+  2: { name: "Mittel", desc: "Mehr Tücken und Verwechslungen", color: "level-2" },
+  3: { name: "Schwer", desc: "Fremdwörter & Spezialfälle", color: "level-3" },
+};
+const KATEGORIEN = ["Doppelte Vokale", "Doppelte Konsonanten", "Dehnungs-h", "Groß-/Kleinschreibung"];
+
+const initStats = () => ({
+  sessions: 0, totalRichtig: 0, totalFalsch: 0, bestScore: 0, bestStreak: 0,
+  proKategorie: KATEGORIEN.reduce((acc, k) => ({ ...acc, [k]: { richtig: 0, falsch: 0 } }), {}),
+  proLevel: { 1: { richtig: 0, falsch: 0 }, 2: { richtig: 0, falsch: 0 }, 3: { richtig: 0, falsch: 0 } },
+});
+
+const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
+function pickAufgabe(used, level) {
+  const verfuegbar = AUFGABEN.map((a, i) => ({ a, i })).filter(x => x.a.level === level && !used.includes(x.i));
+  if (verfuegbar.length === 0) {
+    const alle = AUFGABEN.map((a, i) => ({ a, i })).filter(x => x.a.level === level);
+    if (alle.length === 0) return null;
+    const pick = alle[Math.floor(Math.random() * alle.length)];
+    return { aufgabe: pick.a, index: pick.i };
+  }
+  const pick = verfuegbar[Math.floor(Math.random() * verfuegbar.length)];
+  return { aufgabe: pick.a, index: pick.i };
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "de-DE"; u.rate = 0.85;
+  const voices = window.speechSynthesis.getVoices();
+  const deVoice = voices.find(v => v.lang.startsWith("de"));
+  if (deVoice) u.voice = deVoice;
+  window.speechSynthesis.speak(u);
+}
+
+function Stats({ score, streak, runde, total, level }) {
+  return (
+    <div className="stats">
+      <div className="stat"><div className="stat-label">Punkte</div><div className="stat-value score">{score}</div></div>
+      <div className="stat"><div className="stat-label">Streak 🔥</div><div className="stat-value streak">{streak}</div></div>
+      <div className="stat"><div className="stat-label">Runde</div><div className="stat-value">{runde}/{total}</div></div>
+      <div className="stat"><div className="stat-label">Level</div><div className="stat-value level">{LEVELS[level].name}</div></div>
+    </div>
+  );
+}
+
+function StartScreen({ onStart, onShowStats, gesamtStats, ausgewaehltesLevel, setAusgewaehltesLevel }) {
+  return (
+    <div className="card start-screen">
+      <h1>Rechtschreib-<em>Trainer</em></h1>
+      <p style={{marginTop: 16, marginBottom: 8}}>
+        Hi Noah! Wähle dein Level und los geht's.<br/>
+        {ANZAHL_RUNDEN} Aufgaben pro Runde in 3 Modi.
+      </p>
+      <div className="level-cards">
+        {[1, 2, 3].map(l => (
+          <div key={l} className={`level-card ${ausgewaehltesLevel === l ? "selected" : ""}`} onClick={() => setAusgewaehltesLevel(l)}>
+            <div className="level-card-num">{l}</div>
+            <div className="level-card-label">{LEVELS[l].name}</div>
+            <div className="level-card-desc">{LEVELS[l].desc}</div>
+          </div>
+        ))}
+      </div>
+      <button className="btn btn-accent" onClick={onStart}>Los geht's →</button>
+      {gesamtStats.sessions > 0 && (
+        <div><span className="nav-link" onClick={onShowStats}>📊 Meine Statistik ansehen</span></div>
+      )}
+    </div>
+  );
+}
+
+function StatsScreen({ stats, onBack }) {
+  const total = stats.totalRichtig + stats.totalFalsch;
+  const quote = total > 0 ? Math.round((stats.totalRichtig / total) * 100) : 0;
+  const renderBar = (richtig, falsch) => {
+    const ges = richtig + falsch;
+    if (ges === 0) return null;
+    const pct = Math.round((richtig / ges) * 100);
+    const cls = pct >= 75 ? "" : pct >= 50 ? "warn" : "bad";
+    return <div className="cat-stat-bar"><div className={`cat-stat-fill ${cls}`} style={{width: `${pct}%`}}></div></div>;
+  };
+  return (
+    <div className="card">
+      <h2 style={{fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 6}}>Deine Statistik</h2>
+      <p style={{color: "var(--muted)", fontSize: 14, marginBottom: 8}}>Dein Fortschritt über alle Runden in dieser Sitzung.</p>
+      <div className="summary-grid">
+        <div className="summary-tile"><div className="summary-tile-label">Runden</div><div className="summary-tile-value">{stats.sessions}</div></div>
+        <div className="summary-tile"><div className="summary-tile-label">Trefferquote</div><div className="summary-tile-value">{quote}%</div></div>
+        <div className="summary-tile"><div className="summary-tile-label">Beste Punkte</div><div className="summary-tile-value">{stats.bestScore}</div></div>
+        <div className="summary-tile"><div className="summary-tile-label">Beste Streak</div><div className="summary-tile-value">{stats.bestStreak} 🔥</div></div>
+      </div>
+      <div className="stats-block">
+        <h3>Pro Kategorie</h3>
+        {KATEGORIEN.map(k => {
+          const s = stats.proKategorie[k];
+          const ges = s.richtig + s.falsch;
+          const pct = ges > 0 ? Math.round((s.richtig / ges) * 100) : 0;
+          return (
+            <div key={k} className="cat-stat-row">
+              <div className="cat-stat-label">{k}</div>
+              {ges > 0 ? renderBar(s.richtig, s.falsch) : <div className="cat-stat-bar"></div>}
+              <div className="cat-stat-num">{ges > 0 ? `${pct}%` : "–"}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="stats-block">
+        <h3>Pro Level</h3>
+        {[1, 2, 3].map(l => {
+          const s = stats.proLevel[l];
+          const ges = s.richtig + s.falsch;
+          const pct = ges > 0 ? Math.round((s.richtig / ges) * 100) : 0;
+          return (
+            <div key={l} className="cat-stat-row">
+              <div className="cat-stat-label">Level {l} – {LEVELS[l].name}</div>
+              {ges > 0 ? renderBar(s.richtig, s.falsch) : <div className="cat-stat-bar"></div>}
+              <div className="cat-stat-num">{ges > 0 ? `${pct}%` : "–"}</div>
+            </div>
+          );
+        })}
+      </div>
+      <button className="btn btn-secondary" onClick={onBack}>← Zurück</button>
+    </div>
+  );
+}
+
+function MultipleChoice({ aufgabe, onAnswer }) {
+  const [gewaehlt, setGewaehlt] = useState(null);
+  const [optionen] = useState(() => shuffle([aufgabe.wort, ...aufgabe.falsch]));
+  const handle = (opt) => {
+    if (gewaehlt) return;
+    setGewaehlt(opt);
+    setTimeout(() => onAnswer(opt === aufgabe.wort, opt), 1200);
+  };
+  return (
+    <div className="card">
+      <div className="mode-badge">Multiple Choice</div>
+      <span className={`level-badge ${LEVELS[aufgabe.level].color}`}>L{aufgabe.level}</span>
+      <span className="category-tag">{aufgabe.kategorie}</span>
+      <div className="question">Welche Schreibweise ist <strong>richtig</strong>?</div>
+      <div className="options">
+        {optionen.map(opt => {
+          let cls = "option";
+          if (gewaehlt) {
+            if (opt === aufgabe.wort) cls += " correct";
+            else if (opt === gewaehlt) cls += " wrong";
+          }
+          return <button key={opt} className={cls} disabled={!!gewaehlt} onClick={() => handle(opt)}>{opt}</button>;
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Lueckentext({ aufgabe, onAnswer }) {
+  const [eingabe, setEingabe] = useState("");
+  const [status, setStatus] = useState(null);
+  const inputRef = useRef(null);
+  useEffect(() => { inputRef.current?.focus(); }, []);
+  const pruefen = () => {
+    if (!eingabe.trim() || status) return;
+    const richtig = eingabe.trim() === aufgabe.wort;
+    setStatus(richtig ? "correct" : "wrong");
+    setTimeout(() => onAnswer(richtig, eingabe.trim()), 1500);
+  };
+  const handleKey = (e) => { if (e.key === "Enter") pruefen(); };
+  const teile = aufgabe.satz.split("___");
+  return (
+    <div className="card">
+      <div className="mode-badge">Lückentext</div>
+      <span className={`level-badge ${LEVELS[aufgabe.level].color}`}>L{aufgabe.level}</span>
+      <span className="category-tag">{aufgabe.kategorie}</span>
+      <div className="question" style={{marginBottom: 12}}>Setze das richtige Wort ein:</div>
+      <div className="lueckentext">
+        {teile[0]}
+        <input ref={inputRef} type="text" value={eingabe} onChange={(e) => setEingabe(e.target.value)} onKeyDown={handleKey} disabled={!!status} className={status === "correct" ? "correct" : status === "wrong" ? "wrong" : ""} placeholder="…" autoComplete="off" spellCheck="false" />
+        {teile[1]}
+      </div>
+      <button className="btn btn-accent" onClick={pruefen} disabled={!!status || !eingabe.trim()}>Prüfen</button>
+    </div>
+  );
+}
+
+function Diktat({ aufgabe, onAnswer }) {
+  const [eingabe, setEingabe] = useState("");
+  const [status, setStatus] = useState(null);
+  const inputRef = useRef(null);
+  useEffect(() => {
+    if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
+    setTimeout(() => speak(aufgabe.wort), 300);
+    setTimeout(() => inputRef.current?.focus(), 600);
+  }, [aufgabe]);
+  const pruefen = () => {
+    if (!eingabe.trim() || status) return;
+    const richtig = eingabe.trim() === aufgabe.wort;
+    setStatus(richtig ? "correct" : "wrong");
+    setTimeout(() => onAnswer(richtig, eingabe.trim()), 1500);
+  };
+  const handleKey = (e) => { if (e.key === "Enter") pruefen(); };
+  return (
+    <div className="card">
+      <div className="mode-badge">Diktat</div>
+      <span className={`level-badge ${LEVELS[aufgabe.level].color}`}>L{aufgabe.level}</span>
+      <span className="category-tag">{aufgabe.kategorie}</span>
+      <div className="question" style={{marginBottom: 16}}>Hör genau hin und schreibe das Wort richtig auf:</div>
+      <button className="audio-btn" onClick={() => speak(aufgabe.wort)}><span className="icon">🔊</span> Wort anhören</button>
+      <input ref={inputRef} type="text" value={eingabe} onChange={(e) => setEingabe(e.target.value)} onKeyDown={handleKey} disabled={!!status} className={status === "correct" ? "correct" : status === "wrong" ? "wrong" : ""} placeholder="Wort eingeben…" autoComplete="off" spellCheck="false" />
+      <button className="btn btn-accent" onClick={pruefen} disabled={!!status || !eingabe.trim()}>Prüfen</button>
+    </div>
+  );
+}
+
+function Feedback({ richtig, aufgabe, eingabe }) {
+  return (
+    <div className={`feedback ${richtig ? "correct" : "wrong"}`}>
+      {richtig ? (
+        <><strong>✓ Richtig!</strong> Super gemacht.<div className="hint">{aufgabe.regel}</div></>
+      ) : (
+        <><strong>✗ Leider falsch.</strong> Du hast geschrieben: <em>{eingabe}</em><br/>Richtig wäre: <strong>{aufgabe.wort}</strong><div className="hint">{aufgabe.regel}</div></>
+      )}
+    </div>
+  );
+}
+
+function EndScreen({ score, fehler, level, runden, onRestart, onFehlerUeben, onLevelUp, onHome, onShowStats }) {
+  const max = runden * 15;
+  const prozent = Math.round((score / max) * 100);
+  const note = prozent >= 80 ? "Spitzenklasse! 🏆" :
+               prozent >= 60 ? "Sehr gut! 🌟" :
+               prozent >= 40 ? "Gut gemacht! 👍" :
+               prozent >= 20 ? "Weiter üben! 💪" : "Nochmal probieren! 📚";
+  const kannLevelUp = level < 3 && prozent >= 70;
+  return (
+    <div className="card end-screen">
+      <h2>Geschafft!</h2>
+      <div className="big-score">{score}</div>
+      <div style={{fontSize: 14, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.15em", color: "var(--muted)"}}>Punkte · Level {level}</div>
+      <p style={{marginTop: 16, fontSize: 22, fontWeight: 600}}>{note}</p>
+      {kannLevelUp && (
+        <div style={{marginTop: 16, padding: "12px 16px", background: "var(--blue-soft)", border: "2px solid var(--blue)", borderRadius: 4, color: "var(--blue)"}}>
+          <strong>🎯 Bereit für Level {level + 1}?</strong>
+        </div>
+      )}
+      {fehler.length > 0 && (
+        <div className="mistakes-list">
+          <h3>Diese Wörter waren knifflig:</h3>
+          {fehler.map((f, i) => (
+            <div className="word" key={i}>
+              <span className="wrong-mark">{f.eingabe}</span>
+              <span className="right-mark">{f.aufgabe.wort}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="btn-row" style={{justifyContent: "center"}}>
+        <button className="btn btn-accent" onClick={onRestart}>Neue Runde</button>
+        {kannLevelUp && <button className="btn btn-blue" onClick={onLevelUp}>Level {level + 1} →</button>}
+        {fehler.length > 0 && <button className="btn btn-secondary" onClick={onFehlerUeben}>Fehler üben</button>}
+      </div>
+      <div>
+        <span className="nav-link" onClick={onShowStats}>📊 Statistik</span>
+        <span className="nav-link" onClick={onHome} style={{marginLeft: 16}}>🏠 Start</span>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [phase, setPhase] = useState("start");
+  const [level, setLevel] = useState(1);
+  const [ausgewaehltesLevel, setAusgewaehltesLevel] = useState(1);
+  const [runde, setRunde] = useState(0);
+  const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [aktAufgabe, setAktAufgabe] = useState(null);
+  const [aktModus, setAktModus] = useState(null);
+  const [verwendeteIndizes, setVerwendeteIndizes] = useState([]);
+  const [letzteAntwort, setLetzteAntwort] = useState(null);
+  const [fehler, setFehler] = useState([]);
+  const [fehlerPool, setFehlerPool] = useState(null);
+  const [gesamtStats, setGesamtStats] = useState(initStats);
+
+  const naechsteAufgabe = () => {
+    if (fehlerPool && fehlerPool.length > 0) {
+      const idx = Math.floor(Math.random() * fehlerPool.length);
+      const aufgabe = fehlerPool[idx];
+      setAktAufgabe(aufgabe);
+      setFehlerPool(fehlerPool.filter((_, i) => i !== idx));
+    } else {
+      const result = pickAufgabe(verwendeteIndizes, level);
+      if (!result) { setPhase("ende"); return; }
+      setAktAufgabe(result.aufgabe);
+      setVerwendeteIndizes(prev => [...prev, result.index]);
+    }
+    setAktModus(MODI[Math.floor(Math.random() * MODI.length)]);
+    setPhase("spielen");
+  };
+
+  const start = (neuesLevel = null) => {
+    const lvl = neuesLevel ?? ausgewaehltesLevel;
+    setLevel(lvl);
+    setAusgewaehltesLevel(lvl);
+    setRunde(1); setScore(0); setStreak(0);
+    setFehler([]); setVerwendeteIndizes([]);
+    setFehlerPool(null); setLetzteAntwort(null);
+    setTimeout(() => {
+      const result = pickAufgabe([], lvl);
+      if (result) {
+        setAktAufgabe(result.aufgabe);
+        setVerwendeteIndizes([result.index]);
+        setAktModus(MODI[Math.floor(Math.random() * MODI.length)]);
+        setPhase("spielen");
+      }
+    }, 50);
+  };
+
+  const fehlerUeben = () => {
+    setRunde(1); setScore(0); setStreak(0);
+    setVerwendeteIndizes([]);
+    const pool = fehler.map(f => f.aufgabe);
+    setFehler([]); setLetzteAntwort(null);
+    setTimeout(() => {
+      const idx = Math.floor(Math.random() * pool.length);
+      setAktAufgabe(pool[idx]);
+      setFehlerPool(pool.filter((_, i) => i !== idx));
+      setAktModus(MODI[Math.floor(Math.random() * MODI.length)]);
+      setPhase("spielen");
+    }, 50);
+  };
+
+  const updateStats = (richtig, aufgabe) => {
+    setGesamtStats(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      if (richtig) next.totalRichtig++; else next.totalFalsch++;
+      next.proKategorie[aufgabe.kategorie][richtig ? "richtig" : "falsch"]++;
+      next.proLevel[aufgabe.level][richtig ? "richtig" : "falsch"]++;
+      return next;
+    });
+  };
+
+  const handleAntwort = (richtig, eingabe) => {
+    updateStats(richtig, aktAufgabe);
+    if (richtig) {
+      const punkte = 10 + Math.min(streak, 5);
+      setScore(s => s + punkte);
+      setStreak(s => {
+        const neu = s + 1;
+        setGesamtStats(prev => ({ ...prev, bestStreak: Math.max(prev.bestStreak, neu) }));
+        return neu;
+      });
+    } else {
+      setStreak(0);
+      setFehler(f => [...f, { aufgabe: aktAufgabe, eingabe }]);
+    }
+    setLetzteAntwort({ richtig, eingabe, aufgabe: aktAufgabe });
+    setPhase("feedback");
+  };
+
+  const finalisiereSession = () => {
+    setGesamtStats(prev => ({
+      ...prev,
+      sessions: prev.sessions + 1,
+      bestScore: Math.max(prev.bestScore, score),
+    }));
+    setPhase("ende");
+  };
+
+  const weiter = () => {
+    if (fehlerPool !== null) {
+      if (fehlerPool.length === 0) { finalisiereSession(); return; }
+      setRunde(r => r + 1); setLetzteAntwort(null); naechsteAufgabe();
+      return;
+    }
+    if (runde >= ANZAHL_RUNDEN) { finalisiereSession(); return; }
+    setRunde(r => r + 1); setLetzteAntwort(null); naechsteAufgabe();
+  };
+
+  const totalRunden = fehlerPool !== null ? "?" : ANZAHL_RUNDEN;
+  const progressPct = typeof totalRunden === "number" ? (runde / totalRunden) * 100 : 50;
+
+  return (
+    <>
+      <header>
+        <div className="logo">Deutsch · Klasse 7</div>
+        <h1>Rechtschreib-<em>Trainer</em></h1>
+        <div className="subtitle">Doppel-Vokale · Doppel-Konsonanten · Dehnungs-h · Groß/Klein</div>
+      </header>
+      {(phase === "spielen" || phase === "feedback") && (
+        <>
+          <Stats score={score} streak={streak} runde={runde} total={totalRunden} level={level} />
+          <div className="progress-bar"><div className="progress-fill" style={{width: `${progressPct}%`}}></div></div>
+        </>
+      )}
+      {phase === "start" && (
+        <StartScreen onStart={() => start()} onShowStats={() => setPhase("statsView")} gesamtStats={gesamtStats} ausgewaehltesLevel={ausgewaehltesLevel} setAusgewaehltesLevel={setAusgewaehltesLevel} />
+      )}
+      {phase === "statsView" && <StatsScreen stats={gesamtStats} onBack={() => setPhase("start")} />}
+      {phase === "spielen" && aktAufgabe && (
+        <>
+          {aktModus === "multiple" && <MultipleChoice key={runde} aufgabe={aktAufgabe} onAnswer={handleAntwort} />}
+          {aktModus === "luecke" && <Lueckentext key={runde} aufgabe={aktAufgabe} onAnswer={handleAntwort} />}
+          {aktModus === "diktat" && <Diktat key={runde} aufgabe={aktAufgabe} onAnswer={handleAntwort} />}
+        </>
+      )}
+      {phase === "feedback" && letzteAntwort && (
+        <div className="card">
+          <Feedback {...letzteAntwort} />
+          <button className="btn btn-accent" style={{marginTop: 20}} onClick={weiter}>Weiter →</button>
+        </div>
+      )}
+      {phase === "ende" && (
+        <EndScreen score={score} fehler={fehler} level={level} runden={ANZAHL_RUNDEN} onRestart={() => start(level)} onFehlerUeben={fehlerUeben} onLevelUp={() => start(level + 1)} onHome={() => setPhase("start")} onShowStats={() => setPhase("statsView")} />
+      )}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+</script>
+</body>
+</html>
